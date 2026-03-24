@@ -146,18 +146,6 @@
   {
     "title": "Solutions Engineer - Commercial",
     "company": "Glean",
-    "location": "New York, NY",
-    "region": "AI App",
-    "url": "https://job-boards.greenhouse.io/gleanwork/jobs/4603425005",
-    "http_status": 200,
-    "final_url": "https://job-boards.greenhouse.io/gleanwork?error=true",
-    "verdict": "CLOSED",
-    "confidence": "HIGH",
-    "reason": "Specific job URL redirected to company board"
-  },
-  {
-    "title": "Solutions Engineer - Commercial",
-    "company": "Glean",
     "location": "Austin, TX",
     "region": "AI App",
     "url": "https://job-boards.greenhouse.io/gleanwork/jobs/4603423005",
@@ -166,6 +154,18 @@
     "verdict": "OPEN",
     "confidence": "HIGH",
     "reason": "Active application mechanism found"
+  },
+  {
+    "title": "Solutions Engineer - Commercial",
+    "company": "Glean",
+    "location": "New York, NY",
+    "region": "AI App",
+    "url": "https://job-boards.greenhouse.io/gleanwork/jobs/4603425005",
+    "http_status": 200,
+    "final_url": "https://job-boards.greenhouse.io/gleanwork?error=true",
+    "verdict": "CLOSED",
+    "confidence": "HIGH",
+    "reason": "Specific job URL redirected to company board"
   },
   {
     "title": "Senior Aerodynamics Engineer",

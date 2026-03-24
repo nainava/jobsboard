@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Freshness Audit — BuildList — 2026-03-24</title>
+    <title>Freshness Audit: BuildList</title>
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%94%8D%3C/text%3E%3C/svg%3E">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     <style>
@@ -66,26 +67,31 @@
         .open-range {
             display: inline-flex;
             align-items: center;
-            gap: 6px;
+            gap: 4px;
             flex-wrap: nowrap;
+            transform: scale(0.85);
+            transform-origin: right center;
+            opacity: 0.7;
         }
-        .open-range-label { font-size: 12px; color: #64748b; white-space: nowrap; }
+        .open-range:hover { opacity: 1; }
+        .open-range-label { font-size: 11px; color: #94a3b8; white-space: nowrap; }
+        .open-range-hint { font-size: 9px; color: #b0b8c4; white-space: nowrap; }
         .range-input {
-            width: 48px;
-            padding: 4px 6px;
+            width: 40px;
+            padding: 3px 4px;
             border-radius: 4px;
             border: 1px solid #e2e8f0;
-            font-size: 12px;
+            font-size: 11px;
             font-family: inherit;
             text-align: center;
-            color: #334155;
+            color: #64748b;
         }
         .range-input:focus { outline: none; border-color: #94a3b8; }
         .btn-go {
-            padding: 5px 10px !important;
-            font-size: 11px !important;
+            padding: 3px 8px !important;
+            font-size: 10px !important;
         }
-        .increment-btns { display: inline-flex; gap: 3px; margin-left: 4px; }
+        .increment-btns { display: inline-flex; gap: 2px; margin-left: 2px; }
         .pill-sm {
             padding: 3px 8px;
             border-radius: 4px;
@@ -183,10 +189,13 @@
             font-weight: 500;
             font-family: inherit;
             color: #64748b;
-            transition: all 0.12s;
+            -webkit-appearance: none;
+            appearance: none;
+            outline: none;
         }
-        .pill:hover { background: #f8fafc; }
-        .pill.active { background: #0f172a; color: white; border-color: #0f172a; }
+        .pill:hover, .pill:focus, .pill:focus-visible, .pill:active { background: white !important; border-color: #e2e8f0 !important; color: #64748b !important; outline: none !important; box-shadow: none !important; }
+        .pill.active { background: #0f172a !important; color: white !important; border-color: #0f172a !important; }
+        .pill.active:hover, .pill.active:focus, .pill.active:focus-visible, .pill.active:active { background: #0f172a !important; color: white !important; border-color: #0f172a !important; }
         .pill .ct { opacity: 0.5; margin-left: 3px; }
 
         /* ── Table ── */
@@ -240,12 +249,12 @@
             letter-spacing: 0;
         }
         .region-closed-badge { background: #fef2f2; color: #dc2626; }
-        .region-update-badge { background: #fff7ed; color: #ea580c; }
+        .region-update-badge { background: #fef9e7; color: #b8860b; }
 
-        tr.row-closed { opacity: 0.55; }
-        tr.row-closed:hover { opacity: 0.8; }
-        tr.row-update { background: #fffbf5; }
-        tr.row-update:hover { background: #fff7ed; }
+        tr.row-closed { opacity: 0.85; }
+        tr.row-closed:hover { opacity: 0.85; }
+        ::selection { background: #fde68a; color: #1e293b; }
+        ::-moz-selection { background: #fde68a; color: #1e293b; }
 
         .col-role { min-width: 220px; }
         .job-title { font-weight: 500; color: #0f172a; display: block; }
@@ -300,7 +309,7 @@
             <div class="topbar-left">
                 <h1>Listing Freshness Audit</h1>
                 <div class="meta">
-                    <a href="https://www.buildlist.xyz/jobs">BuildList</a> &middot; 89 listings &middot; Last scanned March 24, 2026 at 14:05
+                    <a href="https://www.buildlist.xyz/jobs">BuildList</a> &middot; 89 listings &middot; Last scanned March 24, 2026 at 15:32
                 </div>
             </div>
             <div class="topbar-right">
@@ -313,7 +322,7 @@
 
         <div class="summary-strip">
             <svg viewBox="0 0 100 100" class="donut">
-        <path d="M 50.0,6.0 A 44,44 0 1 1 7.5329461373754185,61.5130072626114 L 21.045190548210513,57.84977767905323 A 30,30 0 1 0 50.0,20.0 Z" fill="#16a34a" /><path d="M 7.5329461373754185,61.5130072626114 A 44,44 0 0 1 6.8266149527172,58.48874687801785 L 20.563601104125365,55.787781962284896 A 30,30 0 0 0 21.045190548210513,57.84977767905323 Z" fill="#d1d5db" /><path d="M 6.8266149527172,58.48874687801785 A 44,44 0 0 1 6.3353714006773245,55.422195983474985 L 20.228662318643632,53.69695180691476 A 30,30 0 0 0 20.563601104125365,55.787781962284896 Z" fill="#ea580c" /><path d="M 6.3353714006773245,55.422195983474985 A 44,44 0 0 1 49.99999999999999,6.0 L 49.99999999999999,20.0 A 30,30 0 0 0 20.228662318643632,53.69695180691476 Z" fill="#dc2626" />
+        <path d="M 50.0,6.0 A 44,44 0 1 1 7.5329461373754185,61.5130072626114 L 21.045190548210513,57.84977767905323 A 30,30 0 1 0 50.0,20.0 Z" fill="#16a34a" /><path d="M 7.5329461373754185,61.5130072626114 A 44,44 0 0 1 6.8266149527172,58.48874687801785 L 20.563601104125365,55.787781962284896 A 30,30 0 0 0 21.045190548210513,57.84977767905323 Z" fill="#d1d5db" /><path d="M 6.8266149527172,58.48874687801785 A 44,44 0 0 1 6.3353714006773245,55.422195983474985 L 20.228662318643632,53.69695180691476 A 30,30 0 0 0 20.563601104125365,55.787781962284896 Z" fill="#b8860b" /><path d="M 6.3353714006773245,55.422195983474985 A 44,44 0 0 1 49.99999999999999,6.0 L 49.99999999999999,20.0 A 30,30 0 0 0 20.228662318643632,53.69695180691476 Z" fill="#dc2626" />
         <text x="50" y="47" text-anchor="middle" class="donut-pct">71%</text>
         <text x="50" y="57" text-anchor="middle" class="donut-label">healthy</text>
     </svg>
@@ -327,7 +336,7 @@
                     <div class="metric-label">Closed</div>
                 </div>
                 <div class="metric">
-                    <div class="metric-value" style="color:#ea580c;">1</div>
+                    <div class="metric-value" style="color:#b8860b;">1</div>
                     <div class="metric-label">Needs Update</div>
                 </div>
                 <div class="metric">
@@ -341,13 +350,13 @@
                     <div class="health-bar-seg" style="width:70.8%;background:#16a34a;"></div>
                     <div class="health-bar-seg" style="width:0.0%;background:#65a30d;"></div>
                     <div class="health-bar-seg" style="width:1.1%;background:#d1d5db;"></div>
-                    <div class="health-bar-seg" style="width:1.1%;background:#ea580c;"></div>
+                    <div class="health-bar-seg" style="width:1.1%;background:#b8860b;"></div>
                     <div class="health-bar-seg" style="width:27.0%;background:#dc2626;"></div>
                 </div>
                 <div class="legend">
                     <div class="legend-item"><span class="legend-dot" style="background:#16a34a;"></span>Live</div>
                     <div class="legend-item"><span class="legend-dot" style="background:#65a30d;"></span>Likely Live</div>
-                    <div class="legend-item"><span class="legend-dot" style="background:#ea580c;"></span>Needs Update</div>
+                    <div class="legend-item"><span class="legend-dot" style="background:#b8860b;"></span>Needs Update</div>
                     <div class="legend-item"><span class="legend-dot" style="background:#dc2626;"></span>Closed</div>
                 </div>
             </div>
@@ -356,19 +365,20 @@
         <div class="toolbar">
             <input type="text" class="search-box" placeholder="Filter..." oninput="filterTable()" id="searchBox">
             <div class="sep"></div>
-            <button class="pill active" onclick="filterVerdict(this, 'ALL')">All <span class="ct">89</span></button>
-            <button class="pill" onclick="filterVerdict(this, 'OPEN')">Live <span class="ct">63</span></button>
-            <button class="pill" onclick="filterVerdict(this, 'UNCERTAIN')">Likely Live <span class="ct">0</span></button>
-            <button class="pill" onclick="filterVerdict(this, 'NEEDS_UPDATE')">Needs Update <span class="ct">1</span></button>
-            <button class="pill" onclick="filterVerdict(this, 'CLOSED')">Closed <span class="ct">24</span></button>
-            <button class="pill" onclick="filterVerdict(this, 'UNREACHABLE')">Unreachable <span class="ct">1</span></button>
+            <span class="pill active" onclick="filterVerdict(this, 'ALL')">All <span class="ct">89</span></span>
+            <span class="pill" onclick="filterVerdict(this, 'CLOSED')">Closed <span class="ct">24</span></span>
+            <span class="pill" onclick="filterVerdict(this, 'NEEDS_UPDATE')">Needs Update <span class="ct">1</span></span>
+            <span class="pill" onclick="filterVerdict(this, 'UNCERTAIN')">Likely Live <span class="ct">0</span></span>
+            <span class="pill" onclick="filterVerdict(this, 'OPEN')">Live <span class="ct">63</span></span>
+            <span class="pill" onclick="filterVerdict(this, 'UNREACHABLE')">Unreachable <span class="ct">1</span></span>
             <div class="toolbar-spacer"></div>
             <div class="open-range">
                 <span class="open-range-label">Open</span>
                 <input type="number" id="rangeFrom" class="range-input" min="1" value="1">
                 <span class="open-range-label">&ndash;</span>
                 <input type="number" id="rangeTo" class="range-input" min="1" value="20">
-                <span class="open-range-label">of <span id="rangeTotal">0</span></span>
+                <span class="open-range-label">of <span id="rangeTotal">0</span> links</span>
+                <span class="open-range-hint">(excludes mailto)</span>
                 <button class="btn btn-go" onclick="openRange()">
                     <svg viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
                     Go
@@ -483,14 +493,14 @@
             <td class="col-reason">Active application mechanism found</td>
             <td class="col-link"><a href="https://job-boards.greenhouse.io/astranis/jobs/4351178006" target="_blank" rel="noopener" title="https://job-boards.greenhouse.io/astranis/jobs/4351178006">https://job-boards.greenhouse.io/astranis/jobs/4351178006</a></td>
         </tr>
-        <tr class="row-update" data-verdict="NEEDS_UPDATE">
+        <tr class="" data-verdict="NEEDS_UPDATE">
             <td class="col-role">
                 <span class="job-title">Senior Propulsion Component Engineer</span>
                 <span class="job-company">Impulse Space</span>
                 <span class="job-location">Redondo Beach, CA</span>
             </td>
             <td class="col-status">
-                <span class="badge" style="background:#ea580c;">Needs Update</span>
+                <span class="badge" style="background:#b8860b;">Needs Update</span>
             </td>
             <td class="col-reason">URL redirects to generic careers page — needs new link</td>
             <td class="col-link"><a href="https://impulsespace.pinpointhq.com/en/postings/65c93cae-a26a-4ddc-937f-76833ae52a07" target="_blank" rel="noopener" title="https://impulsespace.pinpointhq.com/en/postings/65c93cae-a26a-4ddc-937f-76833ae52a07">https://impulsespace.pinpointhq.com/en/postings/65c93cae-a26a-4ddc-937f-76833...</a></td>
@@ -1038,18 +1048,6 @@
             <td class="col-reason">Page loads with content, no closure signals</td>
             <td class="col-link"><a href="https://jobs.lever.co/palantir/373367a9-3160-49d8-b7af-2efec062fad1" target="_blank" rel="noopener" title="https://jobs.lever.co/palantir/373367a9-3160-49d8-b7af-2efec062fad1">https://jobs.lever.co/palantir/373367a9-3160-49d8-b7af-2efec062fad1</a></td>
         </tr>
-        <tr class="row-closed" data-verdict="CLOSED">
-            <td class="col-role">
-                <span class="job-title">Solutions Engineer - Commercial</span>
-                <span class="job-company">Glean</span>
-                <span class="job-location">New York, NY</span>
-            </td>
-            <td class="col-status">
-                <span class="badge" style="background:#dc2626;">Closed</span>
-            </td>
-            <td class="col-reason">Specific job URL redirected to company board</td>
-            <td class="col-link"><a href="https://job-boards.greenhouse.io/gleanwork/jobs/4603425005" target="_blank" rel="noopener" title="https://job-boards.greenhouse.io/gleanwork/jobs/4603425005">https://job-boards.greenhouse.io/gleanwork/jobs/4603425005</a></td>
-        </tr>
         <tr class="" data-verdict="OPEN">
             <td class="col-role">
                 <span class="job-title">Solutions Engineer - Commercial</span>
@@ -1061,6 +1059,18 @@
             </td>
             <td class="col-reason">Active application mechanism found</td>
             <td class="col-link"><a href="https://job-boards.greenhouse.io/gleanwork/jobs/4603423005" target="_blank" rel="noopener" title="https://job-boards.greenhouse.io/gleanwork/jobs/4603423005">https://job-boards.greenhouse.io/gleanwork/jobs/4603423005</a></td>
+        </tr>
+        <tr class="row-closed" data-verdict="CLOSED">
+            <td class="col-role">
+                <span class="job-title">Solutions Engineer - Commercial</span>
+                <span class="job-company">Glean</span>
+                <span class="job-location">New York, NY</span>
+            </td>
+            <td class="col-status">
+                <span class="badge" style="background:#dc2626;">Closed</span>
+            </td>
+            <td class="col-reason">Specific job URL redirected to company board</td>
+            <td class="col-link"><a href="https://job-boards.greenhouse.io/gleanwork/jobs/4603425005" target="_blank" rel="noopener" title="https://job-boards.greenhouse.io/gleanwork/jobs/4603425005">https://job-boards.greenhouse.io/gleanwork/jobs/4603425005</a></td>
         </tr>
         <tr class="" data-verdict="OPEN">
             <td class="col-role">
@@ -1650,6 +1660,7 @@
         }
 
         updateRangeTotal();
+
     </script>
 </body>
 </html>
