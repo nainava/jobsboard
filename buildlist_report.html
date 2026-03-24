@@ -1,0 +1,1655 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Freshness Audit — BuildList — 2026-03-24</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #ffffff;
+            color: #1e293b;
+            line-height: 1.5;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .container { max-width: 1440px; margin: 0 auto; padding: 32px 40px 48px; }
+
+        /* ── Top bar ── */
+        .topbar {
+            display: flex;
+            align-items: baseline;
+            justify-content: space-between;
+            margin-bottom: 28px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #f1f5f9;
+        }
+        .topbar-left h1 {
+            font-size: 17px;
+            font-weight: 600;
+            color: #0f172a;
+            letter-spacing: -0.2px;
+        }
+        .topbar-left .meta {
+            font-size: 12px;
+            color: #94a3b8;
+            margin-top: 2px;
+        }
+        .topbar-left .meta a { color: #64748b; text-decoration: none; }
+        .topbar-left .meta a:hover { text-decoration: underline; }
+        .topbar-right {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 7px 14px;
+            border-radius: 6px;
+            border: 1px solid #e2e8f0;
+            background: white;
+            font-size: 12px;
+            font-weight: 500;
+            font-family: inherit;
+            color: #475569;
+            cursor: pointer;
+            transition: all 0.12s;
+        }
+        .btn:hover { background: #f8fafc; border-color: #cbd5e1; }
+        .btn svg { width: 14px; height: 14px; stroke: currentColor; fill: none; stroke-width: 2; }
+        .toolbar-spacer { flex: 1; }
+        .open-range {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            flex-wrap: nowrap;
+        }
+        .open-range-label { font-size: 12px; color: #64748b; white-space: nowrap; }
+        .range-input {
+            width: 48px;
+            padding: 4px 6px;
+            border-radius: 4px;
+            border: 1px solid #e2e8f0;
+            font-size: 12px;
+            font-family: inherit;
+            text-align: center;
+            color: #334155;
+        }
+        .range-input:focus { outline: none; border-color: #94a3b8; }
+        .btn-go {
+            padding: 5px 10px !important;
+            font-size: 11px !important;
+        }
+        .increment-btns { display: inline-flex; gap: 3px; margin-left: 4px; }
+        .pill-sm {
+            padding: 3px 8px;
+            border-radius: 4px;
+            border: 1px solid #e2e8f0;
+            background: white;
+            font-size: 11px;
+            font-family: inherit;
+            color: #64748b;
+            cursor: pointer;
+            transition: all 0.12s;
+        }
+        .pill-sm:hover { background: #f1f5f9; border-color: #cbd5e1; color: #334155; }
+        .pill-sm.active { background: #334155; color: white; border-color: #334155; }
+
+        /* ── Summary strip ── */
+        .summary-strip {
+            display: flex;
+            align-items: center;
+            gap: 32px;
+            margin-bottom: 24px;
+            padding: 20px 24px;
+            background: #fafbfc;
+            border: 1px solid #f1f5f9;
+            border-radius: 10px;
+        }
+        .donut { width: 80px; height: 80px; flex-shrink: 0; }
+        .donut-pct { font-size: 16px; font-weight: 700; fill: #0f172a; font-family: 'Inter', sans-serif; }
+        .donut-label { font-size: 6.5px; fill: #94a3b8; font-family: 'Inter', sans-serif; font-weight: 500; text-transform: uppercase; letter-spacing: 0.5px; }
+        .summary-metrics {
+            display: flex;
+            gap: 32px;
+            flex: 1;
+        }
+        .metric { display: flex; flex-direction: column; }
+        .metric-value { font-size: 22px; font-weight: 700; letter-spacing: -0.5px; line-height: 1; }
+        .metric-label { font-size: 11px; color: #64748b; font-weight: 500; margin-top: 3px; }
+
+        .health-bar {
+            flex: 1;
+            min-width: 200px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        .health-bar-label { font-size: 11px; color: #64748b; font-weight: 500; }
+        .health-bar-track {
+            height: 8px;
+            border-radius: 4px;
+            background: #f1f5f9;
+            overflow: hidden;
+            display: flex;
+        }
+        .health-bar-seg { height: 100%; transition: width 0.3s; }
+        .legend {
+            display: flex;
+            gap: 14px;
+            margin-top: 2px;
+        }
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 11px;
+            color: #64748b;
+        }
+        .legend-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+
+        /* ── Toolbar ── */
+        .toolbar {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 12px;
+            flex-wrap: wrap;
+        }
+        .search-box {
+            padding: 7px 12px 7px 32px;
+            border-radius: 6px;
+            border: 1px solid #e2e8f0;
+            font-size: 13px;
+            font-family: inherit;
+            width: 240px;
+            background: white url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='11' cy='11' r='8'%3E%3C/circle%3E%3Cline x1='21' y1='21' x2='16.65' y2='16.65'%3E%3C/line%3E%3C/svg%3E") 10px center no-repeat;
+            transition: border-color 0.12s;
+        }
+        .search-box:focus { outline: none; border-color: #94a3b8; }
+        .sep { width: 1px; height: 20px; background: #e2e8f0; margin: 0 2px; }
+        .pill {
+            padding: 5px 12px;
+            border-radius: 6px;
+            border: 1px solid #e2e8f0;
+            background: white;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 500;
+            font-family: inherit;
+            color: #64748b;
+            transition: all 0.12s;
+        }
+        .pill:hover { background: #f8fafc; }
+        .pill.active { background: #0f172a; color: white; border-color: #0f172a; }
+        .pill .ct { opacity: 0.5; margin-left: 3px; }
+
+        /* ── Table ── */
+        .table-wrap {
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        table { width: 100%; border-collapse: collapse; font-size: 13px; }
+        thead th {
+            background: #f8fafc;
+            padding: 8px 16px;
+            text-align: left;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+            color: #94a3b8;
+            border-bottom: 1px solid #e2e8f0;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+        tbody td {
+            padding: 10px 16px;
+            border-bottom: 1px solid #f1f5f9;
+            vertical-align: top;
+        }
+        tbody tr:last-child td { border-bottom: none; }
+        tbody tr:hover { background: #fafbfc; }
+
+        .region-header td {
+            padding: 8px 16px;
+            font-weight: 600;
+            font-size: 12px;
+            color: #475569;
+            background: #f8fafc;
+            border-bottom: 1px solid #e2e8f0;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+        .region-count { color: #94a3b8; font-weight: 400; }
+        .region-closed-badge, .region-update-badge {
+            display: inline-block;
+            margin-left: 8px;
+            padding: 1px 7px;
+            border-radius: 4px;
+            font-size: 10px;
+            font-weight: 600;
+            text-transform: none;
+            letter-spacing: 0;
+        }
+        .region-closed-badge { background: #fef2f2; color: #dc2626; }
+        .region-update-badge { background: #fff7ed; color: #ea580c; }
+
+        tr.row-closed { opacity: 0.55; }
+        tr.row-closed:hover { opacity: 0.8; }
+        tr.row-update { background: #fffbf5; }
+        tr.row-update:hover { background: #fff7ed; }
+
+        .col-role { min-width: 220px; }
+        .job-title { font-weight: 500; color: #0f172a; display: block; }
+        .job-company { font-size: 12px; color: #64748b; display: block; }
+        .job-location { font-size: 11px; color: #94a3b8; display: block; }
+
+        .col-status { white-space: nowrap; width: 100px; }
+        .col-reason { font-size: 12px; color: #94a3b8; max-width: 260px; }
+        .col-link {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11px;
+            word-break: break-all;
+            max-width: 420px;
+            line-height: 1.4;
+        }
+        .col-link a { color: #475569; text-decoration: none; }
+        .col-link a:hover { color: #0f172a; text-decoration: underline; }
+        .col-link .muted { color: #cbd5e1; }
+
+        .badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 600;
+            color: white;
+            letter-spacing: 0.2px;
+        }
+
+        /* ── Footer ── */
+        .footer {
+            padding: 20px 0;
+            margin-top: 32px;
+            border-top: 1px solid #f1f5f9;
+            text-align: center;
+            font-size: 11px;
+            color: #cbd5e1;
+        }
+
+        @media (max-width: 900px) {
+            .container { padding: 20px 16px 32px; }
+            .summary-strip { flex-direction: column; gap: 16px; }
+            .summary-metrics { flex-wrap: wrap; }
+            .search-box { width: 100%; }
+            .topbar { flex-direction: column; gap: 8px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="topbar">
+            <div class="topbar-left">
+                <h1>Listing Freshness Audit</h1>
+                <div class="meta">
+                    <a href="https://www.buildlist.xyz/jobs">BuildList</a> &middot; 89 listings &middot; Last scanned March 24, 2026 at 14:05
+                </div>
+            </div>
+            <div class="topbar-right">
+                <button class="btn" onclick="exportCSV()">
+                    <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                    Export CSV
+                </button>
+            </div>
+        </div>
+
+        <div class="summary-strip">
+            <svg viewBox="0 0 100 100" class="donut">
+        <path d="M 50.0,6.0 A 44,44 0 1 1 7.5329461373754185,61.5130072626114 L 21.045190548210513,57.84977767905323 A 30,30 0 1 0 50.0,20.0 Z" fill="#16a34a" /><path d="M 7.5329461373754185,61.5130072626114 A 44,44 0 0 1 6.8266149527172,58.48874687801785 L 20.563601104125365,55.787781962284896 A 30,30 0 0 0 21.045190548210513,57.84977767905323 Z" fill="#d1d5db" /><path d="M 6.8266149527172,58.48874687801785 A 44,44 0 0 1 6.3353714006773245,55.422195983474985 L 20.228662318643632,53.69695180691476 A 30,30 0 0 0 20.563601104125365,55.787781962284896 Z" fill="#ea580c" /><path d="M 6.3353714006773245,55.422195983474985 A 44,44 0 0 1 49.99999999999999,6.0 L 49.99999999999999,20.0 A 30,30 0 0 0 20.228662318643632,53.69695180691476 Z" fill="#dc2626" />
+        <text x="50" y="47" text-anchor="middle" class="donut-pct">71%</text>
+        <text x="50" y="57" text-anchor="middle" class="donut-label">healthy</text>
+    </svg>
+            <div class="summary-metrics">
+                <div class="metric">
+                    <div class="metric-value" style="color:#16a34a;">63</div>
+                    <div class="metric-label">Verified Active</div>
+                </div>
+                <div class="metric">
+                    <div class="metric-value" style="color:#dc2626;">24</div>
+                    <div class="metric-label">Closed</div>
+                </div>
+                <div class="metric">
+                    <div class="metric-value" style="color:#ea580c;">1</div>
+                    <div class="metric-label">Needs Update</div>
+                </div>
+                <div class="metric">
+                    <div class="metric-value">89</div>
+                    <div class="metric-label">Total Checked</div>
+                </div>
+            </div>
+            <div class="health-bar">
+                <div class="health-bar-label">Board health</div>
+                <div class="health-bar-track">
+                    <div class="health-bar-seg" style="width:70.8%;background:#16a34a;"></div>
+                    <div class="health-bar-seg" style="width:0.0%;background:#65a30d;"></div>
+                    <div class="health-bar-seg" style="width:1.1%;background:#d1d5db;"></div>
+                    <div class="health-bar-seg" style="width:1.1%;background:#ea580c;"></div>
+                    <div class="health-bar-seg" style="width:27.0%;background:#dc2626;"></div>
+                </div>
+                <div class="legend">
+                    <div class="legend-item"><span class="legend-dot" style="background:#16a34a;"></span>Live</div>
+                    <div class="legend-item"><span class="legend-dot" style="background:#65a30d;"></span>Likely Live</div>
+                    <div class="legend-item"><span class="legend-dot" style="background:#ea580c;"></span>Needs Update</div>
+                    <div class="legend-item"><span class="legend-dot" style="background:#dc2626;"></span>Closed</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="toolbar">
+            <input type="text" class="search-box" placeholder="Filter..." oninput="filterTable()" id="searchBox">
+            <div class="sep"></div>
+            <button class="pill active" onclick="filterVerdict(this, 'ALL')">All <span class="ct">89</span></button>
+            <button class="pill" onclick="filterVerdict(this, 'OPEN')">Live <span class="ct">63</span></button>
+            <button class="pill" onclick="filterVerdict(this, 'UNCERTAIN')">Likely Live <span class="ct">0</span></button>
+            <button class="pill" onclick="filterVerdict(this, 'NEEDS_UPDATE')">Needs Update <span class="ct">1</span></button>
+            <button class="pill" onclick="filterVerdict(this, 'CLOSED')">Closed <span class="ct">24</span></button>
+            <button class="pill" onclick="filterVerdict(this, 'UNREACHABLE')">Unreachable <span class="ct">1</span></button>
+            <div class="toolbar-spacer"></div>
+            <div class="open-range">
+                <span class="open-range-label">Open</span>
+                <input type="number" id="rangeFrom" class="range-input" min="1" value="1">
+                <span class="open-range-label">&ndash;</span>
+                <input type="number" id="rangeTo" class="range-input" min="1" value="20">
+                <span class="open-range-label">of <span id="rangeTotal">0</span></span>
+                <button class="btn btn-go" onclick="openRange()">
+                    <svg viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                    Go
+                </button>
+                <div class="increment-btns">
+                    <button class="pill-sm" onclick="openIncrement(5)">5</button>
+                    <button class="pill-sm" onclick="openIncrement(10)">10</button>
+                    <button class="pill-sm" onclick="openIncrement(15)">15</button>
+                    <button class="pill-sm" onclick="openIncrement(20)">20</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="table-wrap">
+            <table id="jobTable">
+                <thead>
+                    <tr>
+                        <th>Role</th>
+                        <th>Status</th>
+                        <th>Details</th>
+                        <th>URL</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    
+        <tr class="region-header">
+            <td colspan="5">
+                Aerospace <span class="region-count">(26)</span><span class="region-closed-badge">9 closed</span><span class="region-update-badge">1 needs update</span>
+            </td>
+        </tr>
+        <tr class="row-closed" data-verdict="CLOSED">
+            <td class="col-role">
+                <span class="job-title">Senior Vehicle Fluids Engineer, COPV's</span>
+                <span class="job-company">Relativity Space</span>
+                <span class="job-location">Long Beach, CA</span>
+            </td>
+            <td class="col-status">
+                <span class="badge" style="background:#dc2626;">Closed</span>
+            </td>
+            <td class="col-reason">Specific job URL redirected to company board</td>
+            <td class="col-link"><a href="https://boards.greenhouse.io/relativity/jobs/8370677002" target="_blank" rel="noopener" title="https://boards.greenhouse.io/relativity/jobs/8370677002">https://boards.greenhouse.io/relativity/jobs/8370677002</a></td>
+        </tr>
+        <tr class="row-closed" data-verdict="CLOSED">
+            <td class="col-role">
+                <span class="job-title">Quality Manager - New Zealand (Relocation)</span>
+                <span class="job-company">Rocket Lab</span>
+                <span class="job-location">Long Beach, CA</span>
+            </td>
+            <td class="col-status">
+                <span class="badge" style="background:#dc2626;">Closed</span>
+            </td>
+            <td class="col-reason">Specific job URL redirected to company board</td>
+            <td class="col-link"><a href="https://job-boards.greenhouse.io/rocketlab/jobs/6509413003" target="_blank" rel="noopener" title="https://job-boards.greenhouse.io/rocketlab/jobs/6509413003">https://job-boards.greenhouse.io/rocketlab/jobs/6509413003</a></td>
+        </tr>
+        <tr class="row-closed" data-verdict="CLOSED">
+            <td class="col-role">
+                <span class="job-title">Modeling & Simulation Software Engineering Intern</span>
+                <span class="job-company">Hermeus</span>
+                <span class="job-location">Los Angeles, CA</span>
+            </td>
+            <td class="col-status">
+                <span class="badge" style="background:#dc2626;">Closed</span>
+            </td>
+            <td class="col-reason">HTTP 404 — page not found</td>
+            <td class="col-link"><a href="https://jobs.lever.co/hermeus/dcd92687-0f98-4288-a68e-403fcd654853" target="_blank" rel="noopener" title="https://jobs.lever.co/hermeus/dcd92687-0f98-4288-a68e-403fcd654853">https://jobs.lever.co/hermeus/dcd92687-0f98-4288-a68e-403fcd654853</a></td>
+        </tr>
+        <tr class="" data-verdict="OPEN">
+            <td class="col-role">
+                <span class="job-title">Senior Aerodynamics Engineer</span>
+                <span class="job-company">Rocket Lab</span>
+                <span class="job-location">New Zealand</span>
+            </td>
+            <td class="col-status">
+                <span class="badge" style="background:#16a34a;">Live</span>
+            </td>
+            <td class="col-reason">Active application mechanism found</td>
+            <td class="col-link"><a href="https://job-boards.greenhouse.io/rocketlab/jobs/6672816003" target="_blank" rel="noopener" title="https://job-boards.greenhouse.io/rocketlab/jobs/6672816003">https://job-boards.greenhouse.io/rocketlab/jobs/6672816003</a></td>
+        </tr>
+        <tr class="row-closed" data-verdict="CLOSED">
+            <td class="col-role">
+                <span class="job-title">Vehicle Structures Design Engineer II</span>
+                <span class="job-company">Relativity Space</span>
+                <span class="job-location">Long Beach, CA</span>
+            </td>
+            <td class="col-status">
+                <span class="badge" style="background:#dc2626;">Closed</span>
+            </td>
+            <td class="col-reason">Specific job URL redirected to company board</td>
+            <td class="col-link"><a href="https://boards.greenhouse.io/relativity/jobs/8217630002" target="_blank" rel="noopener" title="https://boards.greenhouse.io/relativity/jobs/8217630002">https://boards.greenhouse.io/relativity/jobs/8217630002</a></td>
+        </tr>
+        <tr class="" data-verdict="OPEN">
+            <td class="col-role">
+                <span class="job-title">Manager, Infrastructure Engineering</span>
+                <span class="job-company">Relativity Space</span>
+                <span class="job-location">Stennis Space Center, MS</span>
+            </td>
+            <td class="col-status">
+                <span class="badge" style="background:#16a34a;">Live</span>
+            </td>
+            <td class="col-reason">Active application mechanism found</td>
+            <td class="col-link"><a href="https://boards.greenhouse.io/relativity/jobs/8391640002" target="_blank" rel="noopener" title="https://boards.greenhouse.io/relativity/jobs/8391640002">https://boards.greenhouse.io/relativity/jobs/8391640002</a></td>
+        </tr>
+        <tr class="" data-verdict="OPEN">
+            <td class="col-role">
+                <span class="job-title">Avionics Test Hardware Development Engineer</span>
+                <span class="job-company">Astranis</span>
+                <span class="job-location">San Francisco, CA</span>
+            </td>
+            <td class="col-status">
+                <span class="badge" style="background:#16a34a;">Live</span>
+            </td>
+            <td class="col-reason">Active application mechanism found</td>
+            <td class="col-link"><a href="https://job-boards.greenhouse.io/astranis/jobs/4351178006" target="_blank" rel="noopener" title="https://job-boards.greenhouse.io/astranis/jobs/4351178006">https://job-boards.greenhouse.io/astranis/jobs/4351178006</a></td>
+        </tr>
+        <tr class="row-update" data-verdict="NEEDS_UPDATE">
+            <td class="col-role">
+                <span class="job-title">Senior Propulsion Component Engineer</span>
+                <span class="job-company">Impulse Space</span>
+                <span class="job-location">Redondo Beach, CA</span>
+            </td>
+            <td class="col-status">
+                <span class="badge" style="background:#ea580c;">Needs Update</span>
+            </td>
+            <td class="col-reason">URL redirects to generic careers page — needs new link</td>
+            <td class="col-link"><a href="https://impulsespace.pinpointhq.com/en/postings/65c93cae-a26a-4ddc-937f-76833ae52a07" target="_blank" rel="noopener" title="https://impulsespace.pinpointhq.com/en/postings/65c93cae-a26a-4ddc-937f-76833ae52a07">https://impulsespace.pinpointhq.com/en/postings/65c93cae-a26a-4ddc-937f-76833...</a></td>
+        </tr>
+        <tr class="" data-verdict="OPEN">
+            <td class="col-role">
+                <span class="job-title">Backend Engineer</span>
+                <span class="job-company">Quindar</span>
+                <span class="job-location">Arvada, CO</span>
+            </td>
+            <td class="col-status">
+                <span class="badge" style="background:#16a34a;">Live</span>
+            </td>
+            <td class="col-reason">Page loads with content, no closure signals</td>
+            <td class="col-link"><a href="https://jobs.ashbyhq.com/quindar/d2cc76c7-0a97-4ff2-ba85-c8b896b55fc6" target="_blank" rel="noopener" title="https://jobs.ashbyhq.com/quindar/d2cc76c7-0a97-4ff2-ba85-c8b896b55fc6">https://jobs.ashbyhq.com/quindar/d2cc76c7-0a97-4ff2-ba85-c8b896b55fc6</a></td>
+        </tr>
+        <tr class="" data-verdict="OPEN">
+            <td class="col-role">
+                <span class="job-title">Lunar Welder/Laser Operator III D-Shift</span>
+                <span class="job-company">Blue Origin</span>
+                <span class="job-location">Space Coast, FL</span>
+            </td>
+            <td class="col-status">
+                <span class="badge" style="background:#16a34a;">Live</span>
+            </td>
+            <td class="col-reason">Page loads with content, no closure signals</td>
+            <td class="col-link"><a href="https://blueorigin.wd5.myworkdayjobs.com/en-US/BlueOrigin/job/Space-Coast-FL/Lunar-Welder-Laser-Operator-III-D-Shift_R59969" target="_blank" rel="noopener" title="https://blueorigin.wd5.myworkdayjobs.com/en-US/BlueOrigin/job/Space-Coast-FL/Lunar-Welder-Laser-Operator-III-D-Shift_R59969">https://blueorigin.wd5.myworkdayjobs.com/en-US/BlueOrigin/job/Space-Coast-FL/...</a></td>
+        </tr>
+        <tr class="" data-verdict="OPEN">
+            <td class="col-role">
+                <span class="job-title">Ground Software Engineer (Senior)</span>
+                <span class="job-company">Apex Space</span>
+                <span class="job-location">Los Angeles, CA</span>
+            </td>
+            <td class="col-status">
+                <span class="badge" style="background:#16a34a;">Live</span>
+            </td>
+            <td class="col-reason">Page loads with content, no closure signals</td>
+            <td class="col-link"><a href="https://jobs.ashbyhq.com/apex-technology-inc/be500ce9-e204-440e-bad0-891660c67e5e" target="_blank" rel="noopener" title="https://jobs.ashbyhq.com/apex-technology-inc/be500ce9-e204-440e-bad0-891660c67e5e">https://jobs.ashbyhq.com/apex-technology-inc/be500ce9-e204-440e-bad0-891660c6...</a></td>
+        </tr>
+        <tr class="" data-verdict="UNREACHABLE">
+            <td class="col-role">
+                <span class="job-title">Electronics Technician (Falcon Test)</span>
+                <span class="job-company">SpaceX</span>
+                <span class="job-location">McGregor, TX</span>
+            </td>
+            <td class="col-status">
+                <span class="badge" style="background:#9ca3af;">Unreachable</span>
+            </td>
+            <td class="col-reason">HTTP 520 — server error</td>
+            <td class="col-link"><a href="https://boards.greenhouse.io/spacex/jobs/8372301002" target="_blank" rel="noopener" title="https://boards.greenhouse.io/spacex/jobs/8372301002">https://boards.greenhouse.io/spacex/jobs/8372301002</a></td>
+        </tr>
+        <tr class="" data-verdict="OPEN">
+            <td class="col-role">
+                <span class="job-title">Engine Technician II - AFRL</span>
+                <span class="job-company">Blue Origin</span>
+                <span class="job-location">Lancaster, CA</span>
+            </td>
+            <td class="col-status">
+                <span class="badge" style="background:#16a34a;">Live</span>
+            </td>
+            <td class="col-reason">Page loads with content, no closure signals</td>
+            <td class="col-link"><a href="https://blueorigin.wd5.myworkdayjobs.com/en-US/BlueOrigin/job/Lancaster-CA/Engine-Technician-II---AFRL_R59659" target="_blank" rel="noopener" title="https://blueorigin.wd5.myworkdayjobs.com/en-US/BlueOrigin/job/Lancaster-CA/Engine-Technician-II---AFRL_R59659">https://blueorigin.wd5.myworkdayjobs.com/en-US/BlueOrigin/job/Lancaster-CA/En...</a></td>
+        </tr>
+        <tr class="row-closed" data-verdict="CLOSED">
+            <td class="col-role">
+                <span class="job-title">Quality Engineer II / Senior - Machining</span>
+                <span class="job-company">Rocket Lab</span>
+                <span class="job-location">Long Beach, CA</span>
+            </td>
+            <td class="col-status">
+                <span class="badge" style="background:#dc2626;">Closed</span>
+            </td>
+            <td class="col-reason">Specific job URL redirected to company board</td>
+            <td class="col-link"><a href="https://job-boards.greenhouse.io/rocketlab/jobs/7518007003" target="_blank" rel="noopener" title="https://job-boards.greenhouse.io/rocketlab/jobs/7518007003">https://job-boards.greenhouse.io/rocketlab/jobs/7518007003</a></td>
+        </tr>
+        <tr class="" data-verdict="OPEN">
+            <td class="col-role">
+                <span class="job-title">Senior Software Engineer (Secret Clearance)</span>
+                <span class="job-company">Turion Space</span>
+                <span class="job-location">Irvine, CA</span>
+            </td>
+            <td class="col-status">
+                <span class="badge" style="background:#16a34a;">Live</span>
+            </td>
+            <td class="col-reason">Page loads with content, no closure signals</td>
+            <td class="col-link"><a href="https://jobs.ashbyhq.com/turion-space/e6a0d209-93a5-4e60-92b6-de4663fd8fea" target="_blank" rel="noopener" title="https://jobs.ashbyhq.com/turion-space/e6a0d209-93a5-4e60-92b6-de4663fd8fea">https://jobs.ashbyhq.com/turion-space/e6a0d209-93a5-4e60-92b6-de4663fd8fea</a></td>
+        </tr>
+        <tr class="" data-verdict="OPEN">
+            <td class="col-role">
+                <span class="job-title">Senior Structural Analysis Engineer</span>
+                <span class="job-company">Turion Space</span>
+                <span class="job-location">Irvine, CA</span>
+            </td>
+            <td class="col-status">
+                <span class="badge" style="background:#16a34a;">Live</span>
+            </td>
+            <td class="col-reason">Page loads with content, no closure signals</td>
+            <td class="col-link"><a href="https://jobs.ashbyhq.com/turion-space/9563a368-efac-4989-bb2d-ca56c8702088" target="_blank" rel="noopener" title="https://jobs.ashbyhq.com/turion-space/9563a368-efac-4989-bb2d-ca56c8702088">https://jobs.ashbyhq.com/turion-space/9563a368-efac-4989-bb2d-ca56c8702088</a></td>
+        </tr>
+        <tr class="" data-verdict="OPEN">
+            <td class="col-role">
+                <span class="job-title">RF Systems Engineer</span>
+                <span class="job-company">Astranis</span>
+                <span class="job-location">San Francisco, CA</span>
+            </td>
+            <td class="col-status">
+                <span class="badge" style="background:#16a34a;">Live</span>
+            </td>
+            <td class="col-reason">Active application mechanism found</td>
+            <td class="col-link"><a href="https://job-boards.greenhouse.io/astranis/jobs/4611342006" target="_blank" rel="noopener" title="https://job-boards.greenhouse.io/astranis/jobs/4611342006">https://job-boards.greenhouse.io/astranis/jobs/4611342006</a></td>
+        </tr>
+        <tr class="" data-verdict="OPEN">
+            <td class="col-role">
+                <span class="job-title">Construction Project Manager, Starbase (Starship)</span>
+                <span class="job-company">SpaceX</span>
+                <span class="job-location">Starbase, TX</span>
+            </td>
+            <td class="col-status">
+                <span class="badge" style="background:#16a34a;">Live</span>
+            </td>
+            <td class="col-reason">Active application mechanism found</td>
+            <td class="col-link"><a href="https://boards.greenhouse.io/spacex/jobs/8379486002" target="_blank" rel="noopener" title="https://boards.greenhouse.io/spacex/jobs/8379486002">https://boards.greenhouse.io/spacex/jobs/8379486002</a></td>
+        </tr>
+        <tr class="row-closed" data-verdict="CLOSED">
+            <td class="col-role">
+                <span class="job-title">Senior GNC Engineer</span>
+                <span class="job-company">Relativity Space</span>
+                <span class="job-location">Long Beach, CA</span>
+            </td>
+            <td class="col-status">
+                <span class="badge" style="background:#dc2626;">Closed</span>
+            </td>
+            <td class="col-reason">Specific job URL redirected to company board</td>
+            <td class="col-link"><a href="https://boards.greenhouse.io/relativity/jobs/8302357002" target="_blank" rel="noopener" title="https://boards.greenhouse.io/relativity/jobs/8302357002">https://boards.greenhouse.io/relativity/jobs/8302357002</a></td>
+        </tr>
+        <tr class="" data-verdict="OPEN">
+            <td class="col-role">
+                <span class="job-title">Avionics System Test Operations Engineer</span>
+                <span class="job-company">Vast</span>
+                <span class="job-location">Long Beach, CA</span>
+            </td>
+            <td class="col-status">
+                <span class="badge" style="background:#16a34a;">Live</span>
+            </td>
+            <td class="col-reason">Active application mechanism found</td>
+            <td class="col-link"><a href="https://boards.greenhouse.io/vast/jobs/4650748006" target="_blank" rel="noopener" title="https://boards.greenhouse.io/vast/jobs/4650748006">https://boards.greenhouse.io/vast/jobs/4650748006</a></td>
+        </tr>
+        <tr class="row-closed" data-verdict="CLOSED">
+            <td class="col-role">
+                <span class="job-title">Financial Analyst - G&A</span>
+                <span class="job-company">Astranis</span>
+                <span class="job-location">San Francisco, CA</span>
+            </td>
+            <td class="col-status">
+                <span class="badge" style="background:#dc2626;">Closed</span>
+            </td>
+            <td class="col-reason">Specific job URL redirected to company board</td>
+            <td class="col-link"><a href="https://job-boards.greenhouse.io/astranis/jobs/4611371006" target="_blank" rel="noopener" title="https://job-boards.greenhouse.io/astranis/jobs/4611371006">https://job-boards.greenhouse.io/astranis/jobs/4611371006</a></td>
+        </tr>
+        <tr class="row-closed" data-verdict="CLOSED">
+            <td class="col-role">
+                <span class="job-title">Radiation Effects Engineer Intern (Summer 2026)</span>
+                <span class="job-company">Astranis</span>
+                <span class="job-location">San Francisco, CA</span>
+            </td>
+            <td class="col-status">
+                <span class="badge" style="background:#dc2626;">Closed</span>
+            </td>
+            <td class="col-reason">Specific job URL redirected to company board</td>
+            <td class="col-link"><a href="https://job-boards.greenhouse.io/astranis/jobs/4649397006" target="_blank" rel="noopener" title="https://job-boards.greenhouse.io/astranis/jobs/4649397006">https://job-boards.greenhouse.io/astranis/jobs/4649397006</a></td>
+        </tr>
+        <tr class="row-closed" data-verdict="CLOSED">
+            <td class="col-role">
+                <span class="job-title">Senior Computational Design Engineer</span>
+                <span class="job-company">Relativity Space</span>
+                <span class="job-location">Long Beach, CA</span>
+            </td>
+            <td class="col-status">
+                <span class="badge" style="background:#dc2626;">Closed</span>
+            </td>
+            <td class="col-reason">Specific job URL redirected to company board</td>
+            <td class="col-link"><a href="https://boards.greenhouse.io/relativity/jobs/8121941002" target="_blank" rel="noopener" title="https://boards.greenhouse.io/relativity/jobs/8121941002">https://boards.greenhouse.io/relativity/jobs/8121941002</a></td>
+        </tr>
+        <tr class="" data-verdict="OPEN">
+            <td class="col-role">
+                <span class="job-title">Product Manager - Interfaces & Configuration</span>
+                <span class="job-company">Hermeus</span>
+                <span class="job-location">Los Angeles, CA</span>
+            </td>
+            <td class="col-status">
+                <span class="badge" style="background:#16a34a;">Live</span>
+            </td>
+            <td class="col-reason">Active application mechanism found</td>
+            <td class="col-link"><a href="https://jobs.lever.co/hermeus/1573d478-4f02-4547-b43c-ac163c884a68" target="_blank" rel="noopener" title="https://jobs.lever.co/hermeus/1573d478-4f02-4547-b43c-ac163c884a68">https://jobs.lever.co/hermeus/1573d478-4f02-4547-b43c-ac163c884a68</a></td>
+        </tr>
+        <tr class="" data-verdict="OPEN">
+            <td class="col-role">
+                <span class="job-title">Integration Test Engineer</span>
+                <span class="job-company">Vast</span>
+                <span class="job-location">Long Beach, CA</span>
+            </td>
+            <td class="col-status">
+                <span class="badge" style="background:#16a34a;">Live</span>
+            </td>
+            <td class="col-reason">Active application mechanism found</td>
+            <td class="col-link"><a href="https://boards.greenhouse.io/vast/jobs/4593948006" target="_blank" rel="noopener" title="https://boards.greenhouse.io/vast/jobs/4593948006">https://boards.greenhouse.io/vast/jobs/4593948006</a></td>
+        </tr>
+        <tr class="" data-verdict="OPEN">
+            <td class="col-role">
+                <span class="job-title">Fluids Systems Analysis Engineer II - New Glenn</span>
+                <span class="job-company">Blue Origin</span>
+                <span class="job-location">Seattle, WA</span>
+            </td>
+            <td class="col-status">
+                <span class="badge" style="background:#16a34a;">Live</span>
+            </td>
+            <td class="col-reason">Page loads with content, no closure signals</td>
+            <td class="col-link"><a href="https://blueorigin.wd5.myworkdayjobs.com/en-US/BlueOrigin/job/Greater-Seattle-Area/Fluids-Systems-Analysis-Engineer-II---New-Glenn-Stage-2_R59265-1" target="_blank" rel="noopener" title="https://blueorigin.wd5.myworkdayjobs.com/en-US/BlueOrigin/job/Greater-Seattle-Area/Fluids-Systems-Analysis-Engineer-II---New-Glenn-Stage-2_R59265-1">https://blueorigin.wd5.myworkdayjobs.com/en-US/BlueOrigin/job/Greater-Seattle...</a></td>
+        </tr>
+        <tr class="region-header">
+            <td colspan="5">
+                Defense <span class="region-count">(19)</span><span class="region-closed-badge">8 closed</span>
+            </td>
+        </tr>
+        <tr class="" data-verdict="OPEN">
+            <td class="col-role">
+                <span class="job-title">Senior Manager, Software - Perception</span>
+                <span class="job-company">Shield AI</span>
+                <span class="job-location">Washington, DC</span>
+            </td>
+            <td class="col-status">
+                <span class="badge" style="background:#16a34a;">Live</span>
+            </td>
+            <td class="col-reason">Active application mechanism found</td>
+            <td class="col-link"><a href="https://jobs.lever.co/shieldai/cebc0dd3-ffbf-4013-a2ad-ae32732cabd3" target="_blank" rel="noopener" title="https://jobs.lever.co/shieldai/cebc0dd3-ffbf-4013-a2ad-ae32732cabd3">https://jobs.lever.co/shieldai/cebc0dd3-ffbf-4013-a2ad-ae32732cabd3</a></td>
+        </tr>
+        <tr class="" data-verdict="OPEN">
+            <td class="col-role">
+                <span class="job-title">Program Chief Engineer</span>
+                <span class="job-company">Anduril Industries</span>
+                <span class="job-location">Irvine, CA</span>
+            </td>
+            <td class="col-status">
+                <span class="badge" style="background:#16a34a;">Live</span>
+            </td>
+            <td class="col-reason">Active application mechanism found</td>
+            <td class="col-link"><a href="https://boards.greenhouse.io/andurilindustries/jobs/4929997007" target="_blank" rel="noopener" title="https://boards.greenhouse.io/andurilindustries/jobs/4929997007">https://boards.greenhouse.io/andurilindustries/jobs/4929997007</a></td>
+        </tr>
+        <tr class="row-closed" data-verdict="CLOSED">
+            <td class="col-role">
+                <span class="job-title">Technical Program Manager - Classified Programs</span>
+                <span class="job-company">Anduril Industries</span>
+                <span class="job-location">Washington, D.C.</span>
+            </td>
+            <td class="col-status">
+                <span class="badge" style="background:#dc2626;">Closed</span>
+            </td>
+            <td class="col-reason">Specific job URL redirected to company board</td>
+            <td class="col-link"><a href="https://boards.greenhouse.io/andurilindustries/jobs/5040121007" target="_blank" rel="noopener" title="https://boards.greenhouse.io/andurilindustries/jobs/5040121007">https://boards.greenhouse.io/andurilindustries/jobs/5040121007</a></td>
+        </tr>
+        <tr class="" data-verdict="OPEN">
+            <td class="col-role">
+                <span class="job-title">Senior Staff Operations Analyst</span>
+                <span class="job-company">Shield AI</span>
+                <span class="job-location">Washington, DC</span>
+            </td>
+            <td class="col-status">
+                <span class="badge" style="background:#16a34a;">Live</span>
+            </td>
+            <td class="col-reason">Active application mechanism found</td>
+            <td class="col-link"><a href="https://jobs.lever.co/shieldai/c20dd47f-751f-4750-ab67-f352410aa5ac" target="_blank" rel="noopener" title="https://jobs.lever.co/shieldai/c20dd47f-751f-4750-ab67-f352410aa5ac">https://jobs.lever.co/shieldai/c20dd47f-751f-4750-ab67-f352410aa5ac</a></td>
+        </tr>
+        <tr class="row-closed" data-verdict="CLOSED">
+            <td class="col-role">
+                <span class="job-title">Senior TerraLink Software Engineer</span>
+                <span class="job-company">Forterra</span>
+                <span class="job-location">East Palo Alto, CA</span>
+            </td>
+            <td class="col-status">
+                <span class="badge" style="background:#dc2626;">Closed</span>
+            </td>
+            <td class="col-reason">HTTP 404 — page not found</td>
+            <td class="col-link"><a href="https://ats.rippling.com/forterra/jobs/e8d00fb9-f734-47be-b21a-fcbcedb3dd1b" target="_blank" rel="noopener" title="https://ats.rippling.com/forterra/jobs/e8d00fb9-f734-47be-b21a-fcbcedb3dd1b">https://ats.rippling.com/forterra/jobs/e8d00fb9-f734-47be-b21a-fcbcedb3dd1b</a></td>
+        </tr>
+        <tr class="" data-verdict="OPEN">
+            <td class="col-role">
+                <span class="job-title">Senior/Staff AI Engineer - LLM</span>
+                <span class="job-company">Forterra</span>
+                <span class="job-location">East Palo Alto, CA</span>
+            </td>
+            <td class="col-status">
+                <span class="badge" style="background:#16a34a;">Live</span>
+            </td>
+            <td class="col-reason">Active application mechanism found</td>
+            <td class="col-link"><a href="https://ats.rippling.com/forterra/jobs/76b06806-5ba8-4137-87b2-7cd5675b15fe" target="_blank" rel="noopener" title="https://ats.rippling.com/forterra/jobs/76b06806-5ba8-4137-87b2-7cd5675b15fe">https://ats.rippling.com/forterra/jobs/76b06806-5ba8-4137-87b2-7cd5675b15fe</a></td>
+        </tr>
+        <tr class="" data-verdict="OPEN">
+            <td class="col-role">
+                <span class="job-title">Senior Analyst, Engineering Finance</span>
+                <span class="job-company">Anduril Industries</span>
+                <span class="job-location">Costa Mesa, CA</span>
+            </td>
+            <td class="col-status">
+                <span class="badge" style="background:#16a34a;">Live</span>
+            </td>
+            <td class="col-reason">Active application mechanism found</td>
+            <td class="col-link"><a href="https://boards.greenhouse.io/andurilindustries/jobs/5054062007" target="_blank" rel="noopener" title="https://boards.greenhouse.io/andurilindustries/jobs/5054062007">https://boards.greenhouse.io/andurilindustries/jobs/5054062007</a></td>
+        </tr>
+        <tr class="" data-verdict="OPEN">
+            <td class="col-role">
+                <span class="job-title">Classified IT TPM, Intelligence Systems</span>
+                <span class="job-company">Anduril Industries</span>
+                <span class="job-location">Reston, VA</span>
+            </td>
+            <td class="col-status">
+                <span class="badge" style="background:#16a34a;">Live</span>
+            </td>
+            <td class="col-reason">Active application mechanism found</td>
+            <td class="col-link"><a href="https://boards.greenhouse.io/andurilindustries/jobs/5035638007" target="_blank" rel="noopener" title="https://boards.greenhouse.io/andurilindustries/jobs/5035638007">https://boards.greenhouse.io/andurilindustries/jobs/5035638007</a></td>
+        </tr>
+        <tr class="" data-verdict="OPEN">
+            <td class="col-role">
+                <span class="job-title">Mechanical Assembly Technician</span>
+                <span class="job-company">Allen Control Systems</span>
+                <span class="job-location">Austin, TX</span>
+            </td>
+            <td class="col-status">
+                <span class="badge" style="background:#16a34a;">Live</span>
+            </td>
+            <td class="col-reason">Active application mechanism found</td>
+            <td class="col-link"><a href="https://job-boards.greenhouse.io/allencontrolsystems/jobs/4624862008" target="_blank" rel="noopener" title="https://job-boards.greenhouse.io/allencontrolsystems/jobs/4624862008">https://job-boards.greenhouse.io/allencontrolsystems/jobs/4624862008</a></td>
+        </tr>
+        <tr class="row-closed" data-verdict="CLOSED">
+            <td class="col-role">
+                <span class="job-title">Senior Engineering Manager, Manufacturing Software</span>
+                <span class="job-company">Anduril Industries</span>
+                <span class="job-location">Costa Mesa, CA</span>
+            </td>
+            <td class="col-status">
+                <span class="badge" style="background:#dc2626;">Closed</span>
+            </td>
+            <td class="col-reason">Specific job URL redirected to company board</td>
+            <td class="col-link"><a href="https://boards.greenhouse.io/andurilindustries/jobs/4954256007" target="_blank" rel="noopener" title="https://boards.greenhouse.io/andurilindustries/jobs/4954256007">https://boards.greenhouse.io/andurilindustries/jobs/4954256007</a></td>
+        </tr>
+        <tr class="" data-verdict="OPEN">
+            <td class="col-role">
+                <span class="job-title">Senior Software Engineer, Mission Simulation</span>
+                <span class="job-company">Anduril Industries</span>
+                <span class="job-location">Seattle, WA</span>
+            </td>
+            <td class="col-status">
+                <span class="badge" style="background:#16a34a;">Live</span>
+            </td>
+            <td class="col-reason">Active application mechanism found</td>
+            <td class="col-link"><a href="https://boards.greenhouse.io/andurilindustries/jobs/4871675007" target="_blank" rel="noopener" title="https://boards.greenhouse.io/andurilindustries/jobs/4871675007">https://boards.greenhouse.io/andurilindustries/jobs/4871675007</a></td>
+        </tr>
+        <tr class="row-closed" data-verdict="CLOSED">
+            <td class="col-role">
+                <span class="job-title">Executive Assistant to CTO</span>
+                <span class="job-company">Neros</span>
+                <span class="job-location">El Segundo, CA</span>
+            </td>
+            <td class="col-status">
+                <span class="badge" style="background:#dc2626;">Closed</span>
+            </td>
+            <td class="col-reason">Specific job URL redirected to company board</td>
+            <td class="col-link"><a href="https://job-boards.greenhouse.io/nerostechnologies/jobs/5042911007" target="_blank" rel="noopener" title="https://job-boards.greenhouse.io/nerostechnologies/jobs/5042911007">https://job-boards.greenhouse.io/nerostechnologies/jobs/5042911007</a></td>
+        </tr>
+        <tr class="row-closed" data-verdict="CLOSED">
+            <td class="col-role">
+                <span class="job-title">Senior Manufacturing Engineer, NPI</span>
+                <span class="job-company">Anduril Industries</span>
+                <span class="job-location">Irvine, CA</span>
+            </td>
+            <td class="col-status">
+                <span class="badge" style="background:#dc2626;">Closed</span>
+            </td>
+            <td class="col-reason">Specific job URL redirected to company board</td>
+            <td class="col-link"><a href="https://boards.greenhouse.io/andurilindustries/jobs/5064584007" target="_blank" rel="noopener" title="https://boards.greenhouse.io/andurilindustries/jobs/5064584007">https://boards.greenhouse.io/andurilindustries/jobs/5064584007</a></td>
+        </tr>
+        <tr class="row-closed" data-verdict="CLOSED">
+            <td class="col-role">
+                <span class="job-title">Flight Test Instrumentation Engineer</span>
+                <span class="job-company">Anduril Industries</span>
+                <span class="job-location">Costa Mesa, CA</span>
+            </td>
+            <td class="col-status">
+                <span class="badge" style="background:#dc2626;">Closed</span>
+            </td>
+            <td class="col-reason">Specific job URL redirected to company board</td>
+            <td class="col-link"><a href="https://boards.greenhouse.io/andurilindustries/jobs/5056382007" target="_blank" rel="noopener" title="https://boards.greenhouse.io/andurilindustries/jobs/5056382007">https://boards.greenhouse.io/andurilindustries/jobs/5056382007</a></td>
+        </tr>
+        <tr class="row-closed" data-verdict="CLOSED">
+            <td class="col-role">
+                <span class="job-title">Information Systems Security Analyst</span>
+                <span class="job-company">Anduril Industries</span>
+                <span class="job-location">Reston, VA</span>
+            </td>
+            <td class="col-status">
+                <span class="badge" style="background:#dc2626;">Closed</span>
+            </td>
+            <td class="col-reason">Specific job URL redirected to company board</td>
+            <td class="col-link"><a href="https://boards.greenhouse.io/andurilindustries/jobs/5019853007" target="_blank" rel="noopener" title="https://boards.greenhouse.io/andurilindustries/jobs/5019853007">https://boards.greenhouse.io/andurilindustries/jobs/5019853007</a></td>
+        </tr>
+        <tr class="" data-verdict="OPEN">
+            <td class="col-role">
+                <span class="job-title">Data Acquisition Engineer</span>
+                <span class="job-company">Harmattan AI</span>
+                <span class="job-location">France</span>
+            </td>
+            <td class="col-status">
+                <span class="badge" style="background:#16a34a;">Live</span>
+            </td>
+            <td class="col-reason">Page loads with content, no closure signals</td>
+            <td class="col-link"><a href="https://jobs.ashbyhq.com/harmattan-ai/8e122910-5115-401d-91a6-6e5eca2855db" target="_blank" rel="noopener" title="https://jobs.ashbyhq.com/harmattan-ai/8e122910-5115-401d-91a6-6e5eca2855db">https://jobs.ashbyhq.com/harmattan-ai/8e122910-5115-401d-91a6-6e5eca2855db</a></td>
+        </tr>
+        <tr class="" data-verdict="OPEN">
+            <td class="col-role">
+                <span class="job-title">Program Manager, APAC (Japan)</span>
+                <span class="job-company">Skydio</span>
+                <span class="job-location">Japan</span>
+            </td>
+            <td class="col-status">
+                <span class="badge" style="background:#16a34a;">Live</span>
+            </td>
+            <td class="col-reason">Page loads with content, no closure signals</td>
+            <td class="col-link"><a href="https://jobs.ashbyhq.com/skydio/01e93dd8-cc14-41c7-99df-a4ccc31199ed" target="_blank" rel="noopener" title="https://jobs.ashbyhq.com/skydio/01e93dd8-cc14-41c7-99df-a4ccc31199ed">https://jobs.ashbyhq.com/skydio/01e93dd8-cc14-41c7-99df-a4ccc31199ed</a></td>
+        </tr>
+        <tr class="" data-verdict="OPEN">
+            <td class="col-role">
+                <span class="job-title">Systems Engineering Intern</span>
+                <span class="job-company">Skydio</span>
+                <span class="job-location">San Mateo, CA</span>
+            </td>
+            <td class="col-status">
+                <span class="badge" style="background:#16a34a;">Live</span>
+            </td>
+            <td class="col-reason">Page loads with content, no closure signals</td>
+            <td class="col-link"><a href="https://jobs.ashbyhq.com/skydio/6b51f4dd-e1a1-4ad9-af33-1223e7e29a5b" target="_blank" rel="noopener" title="https://jobs.ashbyhq.com/skydio/6b51f4dd-e1a1-4ad9-af33-1223e7e29a5b">https://jobs.ashbyhq.com/skydio/6b51f4dd-e1a1-4ad9-af33-1223e7e29a5b</a></td>
+        </tr>
+        <tr class="row-closed" data-verdict="CLOSED">
+            <td class="col-role">
+                <span class="job-title">Opto-Mechanical Technician</span>
+                <span class="job-company">Anduril Industries</span>
+                <span class="job-location">Lexington, MA</span>
+            </td>
+            <td class="col-status">
+                <span class="badge" style="background:#dc2626;">Closed</span>
+            </td>
+            <td class="col-reason">Specific job URL redirected to company board</td>
+            <td class="col-link"><a href="https://boards.greenhouse.io/andurilindustries/jobs/5016891007" target="_blank" rel="noopener" title="https://boards.greenhouse.io/andurilindustries/jobs/5016891007">https://boards.greenhouse.io/andurilindustries/jobs/5016891007</a></td>
+        </tr>
+        <tr class="region-header">
+            <td colspan="5">
+                Robotics <span class="region-count">(5)</span><span class="region-closed-badge">3 closed</span>
+            </td>
+        </tr>
+        <tr class="row-closed" data-verdict="CLOSED">
+            <td class="col-role">
+                <span class="job-title">IQC Quality Technician</span>
+                <span class="job-company">Figure</span>
+                <span class="job-location">San Jose, CA</span>
+            </td>
+            <td class="col-status">
+                <span class="badge" style="background:#dc2626;">Closed</span>
+            </td>
+            <td class="col-reason">Specific job URL redirected to company board</td>
+            <td class="col-link"><a href="https://job-boards.greenhouse.io/figureai/jobs/4626357006" target="_blank" rel="noopener" title="https://job-boards.greenhouse.io/figureai/jobs/4626357006">https://job-boards.greenhouse.io/figureai/jobs/4626357006</a></td>
+        </tr>
+        <tr class="row-closed" data-verdict="CLOSED">
+            <td class="col-role">
+                <span class="job-title">Robotics Support Specialist (Boston)</span>
+                <span class="job-company">Dusty Robotics</span>
+                <span class="job-location">Boston, MA</span>
+            </td>
+            <td class="col-status">
+                <span class="badge" style="background:#dc2626;">Closed</span>
+            </td>
+            <td class="col-reason">Specific job URL redirected to company board</td>
+            <td class="col-link"><a href="https://boards.greenhouse.io/dustyrobotics/jobs/7532675003" target="_blank" rel="noopener" title="https://boards.greenhouse.io/dustyrobotics/jobs/7532675003">https://boards.greenhouse.io/dustyrobotics/jobs/7532675003</a></td>
+        </tr>
+        <tr class="" data-verdict="OPEN">
+            <td class="col-role">
+                <span class="job-title">Materials and Process Innovation Engineer</span>
+                <span class="job-company">1x</span>
+                <span class="job-location">Palo Alto, CA</span>
+            </td>
+            <td class="col-status">
+                <span class="badge" style="background:#16a34a;">Live</span>
+            </td>
+            <td class="col-reason">Active application mechanism found</td>
+            <td class="col-link"><a href="https://1x.recruitee.com/o/materials-and-process-innovation-engineer" target="_blank" rel="noopener" title="https://1x.recruitee.com/o/materials-and-process-innovation-engineer">https://1x.recruitee.com/o/materials-and-process-innovation-engineer</a></td>
+        </tr>
+        <tr class="" data-verdict="OPEN">
+            <td class="col-role">
+                <span class="job-title">Test Technician</span>
+                <span class="job-company">1x</span>
+                <span class="job-location">San Carlos, CA</span>
+            </td>
+            <td class="col-status">
+                <span class="badge" style="background:#16a34a;">Live</span>
+            </td>
+            <td class="col-reason">Active application mechanism found</td>
+            <td class="col-link"><a href="https://1x.recruitee.com/o/test-technician" target="_blank" rel="noopener" title="https://1x.recruitee.com/o/test-technician">https://1x.recruitee.com/o/test-technician</a></td>
+        </tr>
+        <tr class="row-closed" data-verdict="CLOSED">
+            <td class="col-role">
+                <span class="job-title">Robotics Support Specialist (New Jersey)</span>
+                <span class="job-company">Dusty Robotics</span>
+                <span class="job-location">Newark, NJ</span>
+            </td>
+            <td class="col-status">
+                <span class="badge" style="background:#dc2626;">Closed</span>
+            </td>
+            <td class="col-reason">Specific job URL redirected to company board</td>
+            <td class="col-link"><a href="https://boards.greenhouse.io/dustyrobotics/jobs/6827698003" target="_blank" rel="noopener" title="https://boards.greenhouse.io/dustyrobotics/jobs/6827698003">https://boards.greenhouse.io/dustyrobotics/jobs/6827698003</a></td>
+        </tr>
+        <tr class="region-header">
+            <td colspan="5">
+                AI App <span class="region-count">(9)</span><span class="region-closed-badge">1 closed</span>
+            </td>
+        </tr>
+        <tr class="" data-verdict="OPEN">
+            <td class="col-role">
+                <span class="job-title">Legal Engineer, Paris</span>
+                <span class="job-company">Harvey</span>
+                <span class="job-location">France</span>
+            </td>
+            <td class="col-status">
+                <span class="badge" style="background:#16a34a;">Live</span>
+            </td>
+            <td class="col-reason">Page loads with content, no closure signals</td>
+            <td class="col-link"><a href="https://jobs.ashbyhq.com/harvey/9382f297-c572-4744-a0fd-989861e1bc27" target="_blank" rel="noopener" title="https://jobs.ashbyhq.com/harvey/9382f297-c572-4744-a0fd-989861e1bc27">https://jobs.ashbyhq.com/harvey/9382f297-c572-4744-a0fd-989861e1bc27</a></td>
+        </tr>
+        <tr class="" data-verdict="OPEN">
+            <td class="col-role">
+                <span class="job-title">Software Engineer, Internship - Production Infrastructure</span>
+                <span class="job-company">Palantir</span>
+                <span class="job-location">Seattle, WA</span>
+            </td>
+            <td class="col-status">
+                <span class="badge" style="background:#16a34a;">Live</span>
+            </td>
+            <td class="col-reason">Page loads with content, no closure signals</td>
+            <td class="col-link"><a href="https://jobs.lever.co/palantir/373367a9-3160-49d8-b7af-2efec062fad1" target="_blank" rel="noopener" title="https://jobs.lever.co/palantir/373367a9-3160-49d8-b7af-2efec062fad1">https://jobs.lever.co/palantir/373367a9-3160-49d8-b7af-2efec062fad1</a></td>
+        </tr>
+        <tr class="row-closed" data-verdict="CLOSED">
+            <td class="col-role">
+                <span class="job-title">Solutions Engineer - Commercial</span>
+                <span class="job-company">Glean</span>
+                <span class="job-location">New York, NY</span>
+            </td>
+            <td class="col-status">
+                <span class="badge" style="background:#dc2626;">Closed</span>
+            </td>
+            <td class="col-reason">Specific job URL redirected to company board</td>
+            <td class="col-link"><a href="https://job-boards.greenhouse.io/gleanwork/jobs/4603425005" target="_blank" rel="noopener" title="https://job-boards.greenhouse.io/gleanwork/jobs/4603425005">https://job-boards.greenhouse.io/gleanwork/jobs/4603425005</a></td>
+        </tr>
+        <tr class="" data-verdict="OPEN">
+            <td class="col-role">
+                <span class="job-title">Solutions Engineer - Commercial</span>
+                <span class="job-company">Glean</span>
+                <span class="job-location">Austin, TX</span>
+            </td>
+            <td class="col-status">
+                <span class="badge" style="background:#16a34a;">Live</span>
+            </td>
+            <td class="col-reason">Active application mechanism found</td>
+            <td class="col-link"><a href="https://job-boards.greenhouse.io/gleanwork/jobs/4603423005" target="_blank" rel="noopener" title="https://job-boards.greenhouse.io/gleanwork/jobs/4603423005">https://job-boards.greenhouse.io/gleanwork/jobs/4603423005</a></td>
+        </tr>
+        <tr class="" data-verdict="OPEN">
+            <td class="col-role">
+                <span class="job-title">Commercial Counsel</span>
+                <span class="job-company">Notion</span>
+                <span class="job-location">San Francisco, CA</span>
+            </td>
+            <td class="col-status">
+                <span class="badge" style="background:#16a34a;">Live</span>
+            </td>
+            <td class="col-reason">Active application mechanism found</td>
+            <td class="col-link"><a href="https://jobs.ashbyhq.com/notion/f2ecb1bf-e033-479b-a644-94d21c09ce71" target="_blank" rel="noopener" title="https://jobs.ashbyhq.com/notion/f2ecb1bf-e033-479b-a644-94d21c09ce71">https://jobs.ashbyhq.com/notion/f2ecb1bf-e033-479b-a644-94d21c09ce71</a></td>
+        </tr>
+        <tr class="" data-verdict="OPEN">
+            <td class="col-role">
+                <span class="job-title">Software Engineer, Agent</span>
+                <span class="job-company">Sierra</span>
+                <span class="job-location">United Kingdom</span>
+            </td>
+            <td class="col-status">
+                <span class="badge" style="background:#16a34a;">Live</span>
+            </td>
+            <td class="col-reason">Page loads with content, no closure signals</td>
+            <td class="col-link"><a href="https://jobs.ashbyhq.com/Sierra/b7d1dbcd-ca72-472f-b15e-5b4b0f886be0" target="_blank" rel="noopener" title="https://jobs.ashbyhq.com/Sierra/b7d1dbcd-ca72-472f-b15e-5b4b0f886be0">https://jobs.ashbyhq.com/Sierra/b7d1dbcd-ca72-472f-b15e-5b4b0f886be0</a></td>
+        </tr>
+        <tr class="" data-verdict="OPEN">
+            <td class="col-role">
+                <span class="job-title">Enterprise Account Executive</span>
+                <span class="job-company">Sierra</span>
+                <span class="job-location">Atlanta, GA</span>
+            </td>
+            <td class="col-status">
+                <span class="badge" style="background:#16a34a;">Live</span>
+            </td>
+            <td class="col-reason">Page loads with content, no closure signals</td>
+            <td class="col-link"><a href="https://jobs.ashbyhq.com/Sierra/e4e0b449-57a7-4565-9fe1-30308587f6d1" target="_blank" rel="noopener" title="https://jobs.ashbyhq.com/Sierra/e4e0b449-57a7-4565-9fe1-30308587f6d1">https://jobs.ashbyhq.com/Sierra/e4e0b449-57a7-4565-9fe1-30308587f6d1</a></td>
+        </tr>
+        <tr class="" data-verdict="OPEN">
+            <td class="col-role">
+                <span class="job-title">Director, Product Design</span>
+                <span class="job-company">Harvey</span>
+                <span class="job-location">Remote</span>
+            </td>
+            <td class="col-status">
+                <span class="badge" style="background:#16a34a;">Live</span>
+            </td>
+            <td class="col-reason">Page loads with content, no closure signals</td>
+            <td class="col-link"><a href="https://jobs.ashbyhq.com/harvey/e96d8ab4-a149-48d9-928e-7719e7018554" target="_blank" rel="noopener" title="https://jobs.ashbyhq.com/harvey/e96d8ab4-a149-48d9-928e-7719e7018554">https://jobs.ashbyhq.com/harvey/e96d8ab4-a149-48d9-928e-7719e7018554</a></td>
+        </tr>
+        <tr class="" data-verdict="OPEN">
+            <td class="col-role">
+                <span class="job-title">Software Engineer, New Grad</span>
+                <span class="job-company">Palantir</span>
+                <span class="job-location">Seattle, WA</span>
+            </td>
+            <td class="col-status">
+                <span class="badge" style="background:#16a34a;">Live</span>
+            </td>
+            <td class="col-reason">Page loads with content, no closure signals</td>
+            <td class="col-link"><a href="https://jobs.lever.co/palantir/dea9d3d5-75b2-4588-b7bd-585a47b79c8c" target="_blank" rel="noopener" title="https://jobs.lever.co/palantir/dea9d3d5-75b2-4588-b7bd-585a47b79c8c">https://jobs.lever.co/palantir/dea9d3d5-75b2-4588-b7bd-585a47b79c8c</a></td>
+        </tr>
+        <tr class="region-header">
+            <td colspan="5">
+                Fintech <span class="region-count">(6)</span>
+            </td>
+        </tr>
+        <tr class="" data-verdict="OPEN">
+            <td class="col-role">
+                <span class="job-title">Machine Learning, Content and Navigation</span>
+                <span class="job-company">Whatnot</span>
+                <span class="job-location">San Francisco, CA</span>
+            </td>
+            <td class="col-status">
+                <span class="badge" style="background:#16a34a;">Live</span>
+            </td>
+            <td class="col-reason">Active application mechanism found</td>
+            <td class="col-link"><a href="https://jobs.ashbyhq.com/whatnot/3926a4a7-e441-4ea6-9726-5c22bfe6c025" target="_blank" rel="noopener" title="https://jobs.ashbyhq.com/whatnot/3926a4a7-e441-4ea6-9726-5c22bfe6c025">https://jobs.ashbyhq.com/whatnot/3926a4a7-e441-4ea6-9726-5c22bfe6c025</a></td>
+        </tr>
+        <tr class="" data-verdict="OPEN">
+            <td class="col-role">
+                <span class="job-title">Mid-Market Customer Success Manager</span>
+                <span class="job-company">Brex</span>
+                <span class="job-location">Salt Lake City, UT</span>
+            </td>
+            <td class="col-status">
+                <span class="badge" style="background:#16a34a;">Live</span>
+            </td>
+            <td class="col-reason">Apply destination has active application</td>
+            <td class="col-link"><a href="https://www.brex.com/careers/8307850002" target="_blank" rel="noopener" title="https://www.brex.com/careers/8307850002">https://www.brex.com/careers/8307850002</a></td>
+        </tr>
+        <tr class="" data-verdict="OPEN">
+            <td class="col-role">
+                <span class="job-title">Account Executive, SMB | UK&I</span>
+                <span class="job-company">Deel</span>
+                <span class="job-location">United Kingdom</span>
+            </td>
+            <td class="col-status">
+                <span class="badge" style="background:#16a34a;">Live</span>
+            </td>
+            <td class="col-reason">Page loads with content, no closure signals</td>
+            <td class="col-link"><a href="https://jobs.ashbyhq.com/deel/e693dbc9-3059-42c1-9326-339a90be0f49" target="_blank" rel="noopener" title="https://jobs.ashbyhq.com/deel/e693dbc9-3059-42c1-9326-339a90be0f49">https://jobs.ashbyhq.com/deel/e693dbc9-3059-42c1-9326-339a90be0f49</a></td>
+        </tr>
+        <tr class="" data-verdict="OPEN">
+            <td class="col-role">
+                <span class="job-title">Enterprise Account Executive</span>
+                <span class="job-company">Brex</span>
+                <span class="job-location">New York, NY</span>
+            </td>
+            <td class="col-status">
+                <span class="badge" style="background:#16a34a;">Live</span>
+            </td>
+            <td class="col-reason">Apply destination has active application</td>
+            <td class="col-link"><a href="https://www.brex.com/careers/7732133002" target="_blank" rel="noopener" title="https://www.brex.com/careers/7732133002">https://www.brex.com/careers/7732133002</a></td>
+        </tr>
+        <tr class="" data-verdict="OPEN">
+            <td class="col-role">
+                <span class="job-title">Senior Engineering Manager, Activation</span>
+                <span class="job-company">Brex</span>
+                <span class="job-location">Seattle, WA</span>
+            </td>
+            <td class="col-status">
+                <span class="badge" style="background:#16a34a;">Live</span>
+            </td>
+            <td class="col-reason">Apply destination has active application</td>
+            <td class="col-link"><a href="https://www.brex.com/careers/8330495002" target="_blank" rel="noopener" title="https://www.brex.com/careers/8330495002">https://www.brex.com/careers/8330495002</a></td>
+        </tr>
+        <tr class="" data-verdict="OPEN">
+            <td class="col-role">
+                <span class="job-title">Account Executive (French-speaking)</span>
+                <span class="job-company">Whatnot</span>
+                <span class="job-location">United Kingdom</span>
+            </td>
+            <td class="col-status">
+                <span class="badge" style="background:#16a34a;">Live</span>
+            </td>
+            <td class="col-reason">Page loads with content, no closure signals</td>
+            <td class="col-link"><a href="https://jobs.ashbyhq.com/whatnot/64079bf6-7f68-4bfc-bb76-cb2f267c744f" target="_blank" rel="noopener" title="https://jobs.ashbyhq.com/whatnot/64079bf6-7f68-4bfc-bb76-cb2f267c744f">https://jobs.ashbyhq.com/whatnot/64079bf6-7f68-4bfc-bb76-cb2f267c744f</a></td>
+        </tr>
+        <tr class="region-header">
+            <td colspan="5">
+                Transportation <span class="region-count">(5)</span><span class="region-closed-badge">3 closed</span>
+            </td>
+        </tr>
+        <tr class="" data-verdict="OPEN">
+            <td class="col-role">
+                <span class="job-title">Staff Software Engineer, Quantitative Evaluation</span>
+                <span class="job-company">Waymo</span>
+                <span class="job-location">Mountain View, CA</span>
+            </td>
+            <td class="col-status">
+                <span class="badge" style="background:#16a34a;">Live</span>
+            </td>
+            <td class="col-reason">Active application mechanism found</td>
+            <td class="col-link"><a href="https://careers.withwaymo.com/jobs?gh_jid=6901826" target="_blank" rel="noopener" title="https://careers.withwaymo.com/jobs?gh_jid=6901826">https://careers.withwaymo.com/jobs?gh_jid=6901826</a></td>
+        </tr>
+        <tr class="row-closed" data-verdict="CLOSED">
+            <td class="col-role">
+                <span class="job-title">Intern, Logistics</span>
+                <span class="job-company">Harbinger</span>
+                <span class="job-location">Garden Grove, CA</span>
+            </td>
+            <td class="col-status">
+                <span class="badge" style="background:#dc2626;">Closed</span>
+            </td>
+            <td class="col-reason">Specific job URL redirected to company board</td>
+            <td class="col-link"><a href="https://job-boards.greenhouse.io/harbingermotors/jobs/5039291007" target="_blank" rel="noopener" title="https://job-boards.greenhouse.io/harbingermotors/jobs/5039291007">https://job-boards.greenhouse.io/harbingermotors/jobs/5039291007</a></td>
+        </tr>
+        <tr class="" data-verdict="OPEN">
+            <td class="col-role">
+                <span class="job-title">Training & Development Operations Specialist</span>
+                <span class="job-company">Aurora</span>
+                <span class="job-location">Dallas, TX</span>
+            </td>
+            <td class="col-status">
+                <span class="badge" style="background:#16a34a;">Live</span>
+            </td>
+            <td class="col-reason">Page loads with content, no closure signals</td>
+            <td class="col-link"><a href="https://aurora.tech/jobs/8379316002" target="_blank" rel="noopener" title="https://aurora.tech/jobs/8379316002">https://aurora.tech/jobs/8379316002</a></td>
+        </tr>
+        <tr class="row-closed" data-verdict="CLOSED">
+            <td class="col-role">
+                <span class="job-title">Intern, Quality Engineering</span>
+                <span class="job-company">Harbinger</span>
+                <span class="job-location">Garden Grove, CA</span>
+            </td>
+            <td class="col-status">
+                <span class="badge" style="background:#dc2626;">Closed</span>
+            </td>
+            <td class="col-reason">Specific job URL redirected to company board</td>
+            <td class="col-link"><a href="https://job-boards.greenhouse.io/harbingermotors/jobs/5039296007" target="_blank" rel="noopener" title="https://job-boards.greenhouse.io/harbingermotors/jobs/5039296007">https://job-boards.greenhouse.io/harbingermotors/jobs/5039296007</a></td>
+        </tr>
+        <tr class="row-closed" data-verdict="CLOSED">
+            <td class="col-role">
+                <span class="job-title">Intern, HV Electrical Engineering</span>
+                <span class="job-company">Harbinger</span>
+                <span class="job-location">Garden Grove, CA</span>
+            </td>
+            <td class="col-status">
+                <span class="badge" style="background:#dc2626;">Closed</span>
+            </td>
+            <td class="col-reason">Specific job URL redirected to company board</td>
+            <td class="col-link"><a href="https://job-boards.greenhouse.io/harbingermotors/jobs/5039135007" target="_blank" rel="noopener" title="https://job-boards.greenhouse.io/harbingermotors/jobs/5039135007">https://job-boards.greenhouse.io/harbingermotors/jobs/5039135007</a></td>
+        </tr>
+        <tr class="region-header">
+            <td colspan="5">
+                AI Research <span class="region-count">(6)</span>
+            </td>
+        </tr>
+        <tr class="" data-verdict="OPEN">
+            <td class="col-role">
+                <span class="job-title">Marketplace Operations</span>
+                <span class="job-company">ElevenLabs</span>
+                <span class="job-location">United Kingdom</span>
+            </td>
+            <td class="col-status">
+                <span class="badge" style="background:#16a34a;">Live</span>
+            </td>
+            <td class="col-reason">Page loads with content, no closure signals</td>
+            <td class="col-link"><a href="https://jobs.ashbyhq.com/ElevenLabs/b3dd0a00-6223-405b-9064-8619e98fa6e6" target="_blank" rel="noopener" title="https://jobs.ashbyhq.com/ElevenLabs/b3dd0a00-6223-405b-9064-8619e98fa6e6">https://jobs.ashbyhq.com/ElevenLabs/b3dd0a00-6223-405b-9064-8619e98fa6e6</a></td>
+        </tr>
+        <tr class="" data-verdict="OPEN">
+            <td class="col-role">
+                <span class="job-title">Marketing Ops, Tech & Tools Lead</span>
+                <span class="job-company">OpenAI</span>
+                <span class="job-location">San Francisco, CA</span>
+            </td>
+            <td class="col-status">
+                <span class="badge" style="background:#16a34a;">Live</span>
+            </td>
+            <td class="col-reason">Page loads with content, no closure signals</td>
+            <td class="col-link"><a href="https://jobs.ashbyhq.com/openai/300e420e-d2d9-4767-b546-14e42faa7d53" target="_blank" rel="noopener" title="https://jobs.ashbyhq.com/openai/300e420e-d2d9-4767-b546-14e42faa7d53">https://jobs.ashbyhq.com/openai/300e420e-d2d9-4767-b546-14e42faa7d53</a></td>
+        </tr>
+        <tr class="" data-verdict="OPEN">
+            <td class="col-role">
+                <span class="job-title">Senior Director of People Operations</span>
+                <span class="job-company">Cohere</span>
+                <span class="job-location">San Francisco, CA</span>
+            </td>
+            <td class="col-status">
+                <span class="badge" style="background:#16a34a;">Live</span>
+            </td>
+            <td class="col-reason">Page loads with content, no closure signals</td>
+            <td class="col-link"><a href="https://jobs.ashbyhq.com/cohere/faf5de08-e766-4981-9f89-67e2d8e19189" target="_blank" rel="noopener" title="https://jobs.ashbyhq.com/cohere/faf5de08-e766-4981-9f89-67e2d8e19189">https://jobs.ashbyhq.com/cohere/faf5de08-e766-4981-9f89-67e2d8e19189</a></td>
+        </tr>
+        <tr class="" data-verdict="OPEN">
+            <td class="col-role">
+                <span class="job-title">Senior Research Engineer - Edge, Consumer Products</span>
+                <span class="job-company">OpenAI</span>
+                <span class="job-location">San Francisco, CA</span>
+            </td>
+            <td class="col-status">
+                <span class="badge" style="background:#16a34a;">Live</span>
+            </td>
+            <td class="col-reason">Page loads with content, no closure signals</td>
+            <td class="col-link"><a href="https://jobs.ashbyhq.com/openai/7f9eb43b-423e-43e4-9f42-d14b8ba0f234" target="_blank" rel="noopener" title="https://jobs.ashbyhq.com/openai/7f9eb43b-423e-43e4-9f42-d14b8ba0f234">https://jobs.ashbyhq.com/openai/7f9eb43b-423e-43e4-9f42-d14b8ba0f234</a></td>
+        </tr>
+        <tr class="" data-verdict="OPEN">
+            <td class="col-role">
+                <span class="job-title">Manager, Solutions Engineering</span>
+                <span class="job-company">OpenAI</span>
+                <span class="job-location">San Francisco, CA</span>
+            </td>
+            <td class="col-status">
+                <span class="badge" style="background:#16a34a;">Live</span>
+            </td>
+            <td class="col-reason">Page loads with content, no closure signals</td>
+            <td class="col-link"><a href="https://jobs.ashbyhq.com/openai/ab463045-cd9b-4100-a037-f1135ace1464" target="_blank" rel="noopener" title="https://jobs.ashbyhq.com/openai/ab463045-cd9b-4100-a037-f1135ace1464">https://jobs.ashbyhq.com/openai/ab463045-cd9b-4100-a037-f1135ace1464</a></td>
+        </tr>
+        <tr class="" data-verdict="OPEN">
+            <td class="col-role">
+                <span class="job-title">B2B Marketing Lead, APAC</span>
+                <span class="job-company">OpenAI</span>
+                <span class="job-location">Singapore</span>
+            </td>
+            <td class="col-status">
+                <span class="badge" style="background:#16a34a;">Live</span>
+            </td>
+            <td class="col-reason">Page loads with content, no closure signals</td>
+            <td class="col-link"><a href="https://jobs.ashbyhq.com/openai/c50f31f9-d4e4-46dc-bf80-80511a35c0e6" target="_blank" rel="noopener" title="https://jobs.ashbyhq.com/openai/c50f31f9-d4e4-46dc-bf80-80511a35c0e6">https://jobs.ashbyhq.com/openai/c50f31f9-d4e4-46dc-bf80-80511a35c0e6</a></td>
+        </tr>
+        <tr class="region-header">
+            <td colspan="5">
+                Manufacturing <span class="region-count">(3)</span>
+            </td>
+        </tr>
+        <tr class="" data-verdict="OPEN">
+            <td class="col-role">
+                <span class="job-title">Opportunistic Application</span>
+                <span class="job-company">Quilter</span>
+                <span class="job-location">Remote</span>
+            </td>
+            <td class="col-status">
+                <span class="badge" style="background:#16a34a;">Live</span>
+            </td>
+            <td class="col-reason">Page loads with content, no closure signals</td>
+            <td class="col-link"><a href="https://jobs.ashbyhq.com/quilter/6d48c692-194b-4a78-96d0-c42ce95cdf2a" target="_blank" rel="noopener" title="https://jobs.ashbyhq.com/quilter/6d48c692-194b-4a78-96d0-c42ce95cdf2a">https://jobs.ashbyhq.com/quilter/6d48c692-194b-4a78-96d0-c42ce95cdf2a</a></td>
+        </tr>
+        <tr class="" data-verdict="OPEN">
+            <td class="col-role">
+                <span class="job-title">Strategic Sourcing Specialist II</span>
+                <span class="job-company">ICON</span>
+                <span class="job-location">Austin, TX</span>
+            </td>
+            <td class="col-status">
+                <span class="badge" style="background:#16a34a;">Live</span>
+            </td>
+            <td class="col-reason">Page loads with content, no closure signals</td>
+            <td class="col-link"><a href="https://www.iconbuild.com/careers/5750152004" target="_blank" rel="noopener" title="https://www.iconbuild.com/careers/5750152004">https://www.iconbuild.com/careers/5750152004</a></td>
+        </tr>
+        <tr class="" data-verdict="OPEN">
+            <td class="col-role">
+                <span class="job-title">Production Manager</span>
+                <span class="job-company">Senra Systems</span>
+                <span class="job-location">Cypress, CA</span>
+            </td>
+            <td class="col-status">
+                <span class="badge" style="background:#16a34a;">Live</span>
+            </td>
+            <td class="col-reason">Page loads with content, no closure signals</td>
+            <td class="col-link"><a href="https://www.senrasystems.us/join-our-team?gh_jid=4984732008" target="_blank" rel="noopener" title="https://www.senrasystems.us/join-our-team?gh_jid=4984732008">https://www.senrasystems.us/join-our-team?gh_jid=4984732008</a></td>
+        </tr>
+        <tr class="region-header">
+            <td colspan="5">
+                Public Services <span class="region-count">(3)</span>
+            </td>
+        </tr>
+        <tr class="" data-verdict="OPEN">
+            <td class="col-role">
+                <span class="job-title">Director of Product Security & Privacy</span>
+                <span class="job-company">Flock Safety</span>
+                <span class="job-location">Remote</span>
+            </td>
+            <td class="col-status">
+                <span class="badge" style="background:#16a34a;">Live</span>
+            </td>
+            <td class="col-reason">Page loads with content, no closure signals</td>
+            <td class="col-link"><a href="https://jobs.ashbyhq.com/Flock%20Safety/24315fdf-5832-4065-ae6b-ffb0b945f59a" target="_blank" rel="noopener" title="https://jobs.ashbyhq.com/Flock%20Safety/24315fdf-5832-4065-ae6b-ffb0b945f59a">https://jobs.ashbyhq.com/Flock%20Safety/24315fdf-5832-4065-ae6b-ffb0b945f59a</a></td>
+        </tr>
+        <tr class="" data-verdict="OPEN">
+            <td class="col-role">
+                <span class="job-title">Field Marketer</span>
+                <span class="job-company">Peregrine</span>
+                <span class="job-location">New York, NY</span>
+            </td>
+            <td class="col-status">
+                <span class="badge" style="background:#16a34a;">Live</span>
+            </td>
+            <td class="col-reason">Active application mechanism found</td>
+            <td class="col-link"><a href="https://job-boards.greenhouse.io/peregrinetechnologies/jobs/4649785005" target="_blank" rel="noopener" title="https://job-boards.greenhouse.io/peregrinetechnologies/jobs/4649785005">https://job-boards.greenhouse.io/peregrinetechnologies/jobs/4649785005</a></td>
+        </tr>
+        <tr class="" data-verdict="OPEN">
+            <td class="col-role">
+                <span class="job-title">Senior Product Manager - Government Solutions</span>
+                <span class="job-company">Kodex</span>
+                <span class="job-location">Remote</span>
+            </td>
+            <td class="col-status">
+                <span class="badge" style="background:#16a34a;">Live</span>
+            </td>
+            <td class="col-reason">Page loads with content, no closure signals</td>
+            <td class="col-link"><a href="https://jobs.ashbyhq.com/kodex/c0feb576-e454-49f5-b033-7a485e0abf36" target="_blank" rel="noopener" title="https://jobs.ashbyhq.com/kodex/c0feb576-e454-49f5-b033-7a485e0abf36">https://jobs.ashbyhq.com/kodex/c0feb576-e454-49f5-b033-7a485e0abf36</a></td>
+        </tr>
+        <tr class="region-header">
+            <td colspan="5">
+                Supply Chain <span class="region-count">(2)</span>
+            </td>
+        </tr>
+        <tr class="" data-verdict="OPEN">
+            <td class="col-role">
+                <span class="job-title">L1 Technical Support</span>
+                <span class="job-company">Samsara</span>
+                <span class="job-location">Remote</span>
+            </td>
+            <td class="col-status">
+                <span class="badge" style="background:#16a34a;">Live</span>
+            </td>
+            <td class="col-reason">Active application mechanism found</td>
+            <td class="col-link"><a href="https://www.samsara.com/company/careers/roles/7382743" target="_blank" rel="noopener" title="https://www.samsara.com/company/careers/roles/7382743">https://www.samsara.com/company/careers/roles/7382743</a></td>
+        </tr>
+        <tr class="" data-verdict="OPEN">
+            <td class="col-role">
+                <span class="job-title">Core Enterprise AE - Remote Pennsylvania</span>
+                <span class="job-company">Samsara</span>
+                <span class="job-location">Remote</span>
+            </td>
+            <td class="col-status">
+                <span class="badge" style="background:#16a34a;">Live</span>
+            </td>
+            <td class="col-reason">Active application mechanism found</td>
+            <td class="col-link"><a href="https://www.samsara.com/company/careers/roles/7357073" target="_blank" rel="noopener" title="https://www.samsara.com/company/careers/roles/7357073">https://www.samsara.com/company/careers/roles/7357073</a></td>
+        </tr>
+        <tr class="region-header">
+            <td colspan="5">
+                Energy & Climate <span class="region-count">(3)</span>
+            </td>
+        </tr>
+        <tr class="" data-verdict="OPEN">
+            <td class="col-role">
+                <span class="job-title">Open Call for Engineers</span>
+                <span class="job-company">Oklo</span>
+                <span class="job-location">Remote</span>
+            </td>
+            <td class="col-status">
+                <span class="badge" style="background:#16a34a;">Live</span>
+            </td>
+            <td class="col-reason">Active application mechanism found</td>
+            <td class="col-link"><a href="https://job-boards.greenhouse.io/oklo/jobs/4714198004" target="_blank" rel="noopener" title="https://job-boards.greenhouse.io/oklo/jobs/4714198004">https://job-boards.greenhouse.io/oklo/jobs/4714198004</a></td>
+        </tr>
+        <tr class="" data-verdict="OPEN">
+            <td class="col-role">
+                <span class="job-title">Category Manager - Mechanical</span>
+                <span class="job-company">Crusoe Energy</span>
+                <span class="job-location">Bellevue, WA</span>
+            </td>
+            <td class="col-status">
+                <span class="badge" style="background:#16a34a;">Live</span>
+            </td>
+            <td class="col-reason">Page loads with content, no closure signals</td>
+            <td class="col-link"><a href="https://jobs.ashbyhq.com/Crusoe/b31b8ce7-9858-4271-a0b4-1317866f12bd" target="_blank" rel="noopener" title="https://jobs.ashbyhq.com/Crusoe/b31b8ce7-9858-4271-a0b4-1317866f12bd">https://jobs.ashbyhq.com/Crusoe/b31b8ce7-9858-4271-a0b4-1317866f12bd</a></td>
+        </tr>
+        <tr class="" data-verdict="OPEN">
+            <td class="col-role">
+                <span class="job-title">TPM Intern (IT & Security), Summer 2026</span>
+                <span class="job-company">Crusoe Energy</span>
+                <span class="job-location">San Francisco, CA</span>
+            </td>
+            <td class="col-status">
+                <span class="badge" style="background:#16a34a;">Live</span>
+            </td>
+            <td class="col-reason">Page loads with content, no closure signals</td>
+            <td class="col-link"><a href="https://jobs.ashbyhq.com/Crusoe/158c17cd-c026-4191-b9f3-cbce7fb8ec08" target="_blank" rel="noopener" title="https://jobs.ashbyhq.com/Crusoe/158c17cd-c026-4191-b9f3-cbce7fb8ec08">https://jobs.ashbyhq.com/Crusoe/158c17cd-c026-4191-b9f3-cbce7fb8ec08</a></td>
+        </tr>
+        <tr class="region-header">
+            <td colspan="5">
+                Bio & Health <span class="region-count">(1)</span>
+            </td>
+        </tr>
+        <tr class="" data-verdict="OPEN">
+            <td class="col-role">
+                <span class="job-title">Stars Clinical Program Manager</span>
+                <span class="job-company">Devoted Health</span>
+                <span class="job-location">Remote</span>
+            </td>
+            <td class="col-status">
+                <span class="badge" style="background:#16a34a;">Live</span>
+            </td>
+            <td class="col-reason">Page loads with content, no closure signals</td>
+            <td class="col-link"><a href="https://devoted.wd1.myworkdayjobs.com/en-US/Devoted/job/Remote-USA/Stars-Clinical-Program-Manager_R2868-1" target="_blank" rel="noopener" title="https://devoted.wd1.myworkdayjobs.com/en-US/Devoted/job/Remote-USA/Stars-Clinical-Program-Manager_R2868-1">https://devoted.wd1.myworkdayjobs.com/en-US/Devoted/job/Remote-USA/Stars-Clin...</a></td>
+        </tr>
+        <tr class="region-header">
+            <td colspan="5">
+                Compute & Semiconductors <span class="region-count">(1)</span>
+            </td>
+        </tr>
+        <tr class="" data-verdict="OPEN">
+            <td class="col-role">
+                <span class="job-title">Technical Program Manager, AI Infrastructure</span>
+                <span class="job-company">Cerebras Systems</span>
+                <span class="job-location">Sunnyvale, CA</span>
+            </td>
+            <td class="col-status">
+                <span class="badge" style="background:#16a34a;">Live</span>
+            </td>
+            <td class="col-reason">Active application mechanism found</td>
+            <td class="col-link"><a href="https://job-boards.greenhouse.io/cerebrassystems/jobs/7612357003" target="_blank" rel="noopener" title="https://job-boards.greenhouse.io/cerebrassystems/jobs/7612357003">https://job-boards.greenhouse.io/cerebrassystems/jobs/7612357003</a></td>
+        </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="footer">
+            Automated scan &middot; HTTP status, redirect analysis, content pattern matching &middot; No manual review
+        </div>
+    </div>
+
+    <script>
+        let currentFilter = 'ALL';
+
+        function filterVerdict(btn, verdict) {
+            currentFilter = verdict;
+            document.querySelectorAll('.pill').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            filterTable();
+        }
+
+        function filterTable() {
+            const search = document.getElementById('searchBox').value.toLowerCase();
+            const rows = document.querySelectorAll('#jobTable tbody tr');
+            let currentRegionVisible = false;
+            let lastRegionRow = null;
+
+            rows.forEach(row => {
+                if (row.classList.contains('region-header')) {
+                    lastRegionRow = row;
+                    currentRegionVisible = false;
+                    row.style.display = 'none';
+                    return;
+                }
+
+                const text = row.textContent.toLowerCase();
+                const verdict = row.getAttribute('data-verdict') || '';
+                const matchSearch = !search || text.includes(search);
+                const matchVerdict = currentFilter === 'ALL' || verdict === currentFilter;
+
+                if (matchSearch && matchVerdict) {
+                    row.style.display = '';
+                    if (lastRegionRow && !currentRegionVisible) {
+                        lastRegionRow.style.display = '';
+                        currentRegionVisible = true;
+                    }
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+            updateRangeTotal();
+            document.getElementById('rangeFrom').value = 1;
+            document.getElementById('rangeTo').value = Math.min(lastIncrement, getVisibleUrls().length);
+        }
+
+        let lastIncrement = 20;
+
+        function getVisibleUrls() {
+            const rows = document.querySelectorAll('#jobTable tbody tr:not(.region-header)');
+            const urls = [];
+            rows.forEach(row => {
+                if (row.style.display === 'none') return;
+                const a = row.querySelector('.col-link a');
+                if (a) urls.push(a.href);
+            });
+            return urls;
+        }
+
+        function updateRangeTotal() {
+            const total = getVisibleUrls().length;
+            document.getElementById('rangeTotal').textContent = total;
+            const toEl = document.getElementById('rangeTo');
+            if (parseInt(toEl.value) > total) toEl.value = total;
+        }
+
+        function openRange() {
+            const urls = getVisibleUrls();
+            if (urls.length === 0) return;
+            const from = Math.max(1, parseInt(document.getElementById('rangeFrom').value) || 1);
+            const to = Math.min(urls.length, parseInt(document.getElementById('rangeTo').value) || from);
+            const batch = urls.slice(from - 1, to);
+            batch.forEach(u => window.open(u, '_blank'));
+            const size = to - from + 1;
+            const nextFrom = to + 1;
+            const nextTo = Math.min(nextFrom + size - 1, urls.length);
+            if (nextFrom <= urls.length) {
+                document.getElementById('rangeFrom').value = nextFrom;
+                document.getElementById('rangeTo').value = nextTo;
+            }
+        }
+
+        function openIncrement(n) {
+            lastIncrement = n;
+            document.querySelectorAll('.pill-sm').forEach(b => b.classList.remove('active'));
+            event.target.classList.add('active');
+            const urls = getVisibleUrls();
+            const from = parseInt(document.getElementById('rangeFrom').value) || 1;
+            const to = Math.min(from + n - 1, urls.length);
+            document.getElementById('rangeTo').value = to;
+            openRange();
+        }
+
+        function exportCSV() {
+            const rows = document.querySelectorAll('#jobTable tbody tr:not(.region-header)');
+            let csv = 'Title,Company,Location,Status,Details,URL\n';
+            rows.forEach(row => {
+                const title = row.querySelector('.job-title')?.textContent?.trim() || '';
+                const company = row.querySelector('.job-company')?.textContent?.trim() || '';
+                const location = row.querySelector('.job-location')?.textContent?.trim() || '';
+                const status = row.querySelector('.badge')?.textContent?.trim() || '';
+                const reason = row.querySelector('.col-reason')?.textContent?.trim() || '';
+                const link = row.querySelector('.col-link a')?.getAttribute('href') || '';
+                const esc = s => '"' + s.replace(/"/g, '""') + '"';
+                csv += [esc(title), esc(company), esc(location), esc(status), esc(reason), esc(link)].join(',') + '\n';
+            });
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'freshness-audit-2026-03-24.csv';
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        updateRangeTotal();
+    </script>
+</body>
+</html>

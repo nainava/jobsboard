@@ -1,0 +1,1821 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Freshness Audit: Generalist World</title>
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%94%8D%3C/text%3E%3C/svg%3E">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #ffffff;
+            color: #1e293b;
+            line-height: 1.5;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .container { max-width: 1440px; margin: 0 auto; padding: 32px 40px 48px; }
+
+        /* ── Top bar ── */
+        .topbar {
+            display: flex;
+            align-items: baseline;
+            justify-content: space-between;
+            margin-bottom: 28px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #f1f5f9;
+        }
+        .topbar-left h1 {
+            font-size: 17px;
+            font-weight: 600;
+            color: #0f172a;
+            letter-spacing: -0.2px;
+        }
+        .topbar-left .meta {
+            font-size: 12px;
+            color: #94a3b8;
+            margin-top: 2px;
+        }
+        .topbar-left .meta a { color: #64748b; text-decoration: none; }
+        .topbar-left .meta a:hover { text-decoration: underline; }
+        .topbar-right {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 7px 14px;
+            border-radius: 6px;
+            border: 1px solid #e2e8f0;
+            background: white;
+            font-size: 12px;
+            font-weight: 500;
+            font-family: inherit;
+            color: #475569;
+            cursor: pointer;
+            transition: all 0.12s;
+        }
+        .btn:hover { background: #f8fafc; border-color: #cbd5e1; }
+        .btn svg { width: 14px; height: 14px; stroke: currentColor; fill: none; stroke-width: 2; }
+        .toolbar-spacer { flex: 1; }
+        .open-range {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            flex-wrap: nowrap;
+            transform: scale(0.85);
+            transform-origin: right center;
+            opacity: 0.7;
+        }
+        .open-range:hover { opacity: 1; }
+        .open-range-label { font-size: 11px; color: #94a3b8; white-space: nowrap; }
+        .open-range-hint { font-size: 9px; color: #b0b8c4; white-space: nowrap; }
+        .range-input {
+            width: 40px;
+            padding: 3px 4px;
+            border-radius: 4px;
+            border: 1px solid #e2e8f0;
+            font-size: 11px;
+            font-family: inherit;
+            text-align: center;
+            color: #64748b;
+        }
+        .range-input:focus { outline: none; border-color: #94a3b8; }
+        .btn-go {
+            padding: 3px 8px !important;
+            font-size: 10px !important;
+        }
+        .increment-btns { display: inline-flex; gap: 2px; margin-left: 2px; }
+        .pill-sm {
+            padding: 3px 8px;
+            border-radius: 4px;
+            border: 1px solid #e2e8f0;
+            background: white;
+            font-size: 11px;
+            font-family: inherit;
+            color: #64748b;
+            cursor: pointer;
+            transition: all 0.12s;
+        }
+        .pill-sm:hover { background: #f1f5f9; border-color: #cbd5e1; color: #334155; }
+        .pill-sm.active { background: #334155; color: white; border-color: #334155; }
+
+        /* ── Summary strip ── */
+        .summary-strip {
+            display: flex;
+            align-items: center;
+            gap: 32px;
+            margin-bottom: 24px;
+            padding: 20px 24px;
+            background: #fafbfc;
+            border: 1px solid #f1f5f9;
+            border-radius: 10px;
+        }
+        .donut { width: 80px; height: 80px; flex-shrink: 0; }
+        .donut-pct { font-size: 16px; font-weight: 700; fill: #0f172a; font-family: 'Inter', sans-serif; }
+        .donut-label { font-size: 6.5px; fill: #94a3b8; font-family: 'Inter', sans-serif; font-weight: 500; text-transform: uppercase; letter-spacing: 0.5px; }
+        .summary-metrics {
+            display: flex;
+            gap: 32px;
+            flex: 1;
+        }
+        .metric { display: flex; flex-direction: column; }
+        .metric-value { font-size: 22px; font-weight: 700; letter-spacing: -0.5px; line-height: 1; }
+        .metric-label { font-size: 11px; color: #64748b; font-weight: 500; margin-top: 3px; }
+
+        .health-bar {
+            flex: 1;
+            min-width: 200px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        .health-bar-label { font-size: 11px; color: #64748b; font-weight: 500; }
+        .health-bar-track {
+            height: 8px;
+            border-radius: 4px;
+            background: #f1f5f9;
+            overflow: hidden;
+            display: flex;
+        }
+        .health-bar-seg { height: 100%; transition: width 0.3s; }
+        .legend {
+            display: flex;
+            gap: 14px;
+            margin-top: 2px;
+        }
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 11px;
+            color: #64748b;
+        }
+        .legend-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+
+        /* ── Toolbar ── */
+        .toolbar {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 12px;
+            flex-wrap: wrap;
+        }
+        .search-box {
+            padding: 7px 12px 7px 32px;
+            border-radius: 6px;
+            border: 1px solid #e2e8f0;
+            font-size: 13px;
+            font-family: inherit;
+            width: 240px;
+            background: white url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='11' cy='11' r='8'%3E%3C/circle%3E%3Cline x1='21' y1='21' x2='16.65' y2='16.65'%3E%3C/line%3E%3C/svg%3E") 10px center no-repeat;
+            transition: border-color 0.12s;
+        }
+        .search-box:focus { outline: none; border-color: #94a3b8; }
+        .sep { width: 1px; height: 20px; background: #e2e8f0; margin: 0 2px; }
+        .pill {
+            padding: 5px 12px;
+            border-radius: 6px;
+            border: 1px solid #e2e8f0;
+            background: white;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 500;
+            font-family: inherit;
+            color: #64748b;
+            -webkit-appearance: none;
+            appearance: none;
+            outline: none;
+        }
+        .pill:hover, .pill:focus, .pill:focus-visible, .pill:active { background: white !important; border-color: #e2e8f0 !important; color: #64748b !important; outline: none !important; box-shadow: none !important; }
+        .pill.active { background: #0f172a !important; color: white !important; border-color: #0f172a !important; }
+        .pill.active:hover, .pill.active:focus, .pill.active:focus-visible, .pill.active:active { background: #0f172a !important; color: white !important; border-color: #0f172a !important; }
+        .pill .ct { opacity: 0.5; margin-left: 3px; }
+
+        /* ── Table ── */
+        .table-wrap {
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        table { width: 100%; border-collapse: collapse; font-size: 13px; }
+        thead th {
+            background: #f8fafc;
+            padding: 8px 16px;
+            text-align: left;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+            color: #94a3b8;
+            border-bottom: 1px solid #e2e8f0;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+        tbody td {
+            padding: 10px 16px;
+            border-bottom: 1px solid #f1f5f9;
+            vertical-align: top;
+        }
+        tbody tr:last-child td { border-bottom: none; }
+        tbody tr:hover { background: #fafbfc; }
+
+        .region-header td {
+            padding: 8px 16px;
+            font-weight: 600;
+            font-size: 12px;
+            color: #475569;
+            background: #f8fafc;
+            border-bottom: 1px solid #e2e8f0;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+        .region-count { color: #94a3b8; font-weight: 400; }
+        .region-closed-badge, .region-update-badge {
+            display: inline-block;
+            margin-left: 8px;
+            padding: 1px 7px;
+            border-radius: 4px;
+            font-size: 10px;
+            font-weight: 600;
+            text-transform: none;
+            letter-spacing: 0;
+        }
+        .region-closed-badge { background: #fef2f2; color: #dc2626; }
+        .region-update-badge { background: #fef9e7; color: #b8860b; }
+
+        tr.row-closed { opacity: 0.85; }
+        tr.row-closed:hover { opacity: 0.85; }
+        ::selection { background: #fde68a; color: #1e293b; }
+        ::-moz-selection { background: #fde68a; color: #1e293b; }
+
+        .col-role { min-width: 220px; }
+        .job-title { font-weight: 500; color: #0f172a; display: block; }
+        .job-company { font-size: 12px; color: #64748b; display: block; }
+        .job-location { font-size: 11px; color: #94a3b8; display: block; }
+
+        .col-status { white-space: nowrap; width: 100px; }
+        .col-reason { font-size: 12px; color: #94a3b8; max-width: 260px; }
+        .col-link {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11px;
+            word-break: break-all;
+            max-width: 420px;
+            line-height: 1.4;
+        }
+        .col-link a { color: #475569; text-decoration: none; }
+        .col-link a:hover { color: #0f172a; text-decoration: underline; }
+        .col-link .muted { color: #cbd5e1; }
+
+        .badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 600;
+            color: white;
+            letter-spacing: 0.2px;
+        }
+
+        /* ── Footer ── */
+        .footer {
+            padding: 20px 0;
+            margin-top: 32px;
+            border-top: 1px solid #f1f5f9;
+            text-align: center;
+            font-size: 11px;
+            color: #cbd5e1;
+        }
+
+        @media (max-width: 900px) {
+            .container { padding: 20px 16px 32px; }
+            .summary-strip { flex-direction: column; gap: 16px; }
+            .summary-metrics { flex-wrap: wrap; }
+            .search-box { width: 100%; }
+            .topbar { flex-direction: column; gap: 8px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="topbar">
+            <div class="topbar-left">
+                <h1>Listing Freshness Audit</h1>
+                <div class="meta">
+                    <a href="https://generalist.world/jobs/">generalist.world</a> &middot; 104 listings &middot; Last scanned March 24, 2026 at 14:55
+                </div>
+            </div>
+            <div class="topbar-right">
+                <button class="btn" onclick="exportCSV()">
+                    <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                    Export CSV
+                </button>
+            </div>
+        </div>
+
+        <div class="summary-strip">
+            <svg viewBox="0 0 100 100" class="donut">
+        <path d="M 50.0,6.0 A 44,44 0 1 1 13.788709900679123,74.99484885617085 L 25.31048402319031,67.04194240193468 A 30,30 0 1 0 50.0,20.0 Z" fill="#16a34a" /><path d="M 13.788709900679123,74.99484885617085 A 44,44 0 0 1 8.859285321841746,34.397384970128435 L 21.949512719437553,39.36185338872393 A 30,30 0 0 0 25.31048402319031,67.04194240193468 Z" fill="#65a30d" /><path d="M 8.859285321841746,34.397384970128435 A 44,44 0 0 1 13.788709900679123,25.005151143829135 L 25.310484023190313,32.958057598065324 A 30,30 0 0 0 21.949512719437553,39.36185338872393 Z" fill="#b8860b" /><path d="M 13.788709900679123,25.005151143829135 A 44,44 0 0 1 49.99999999999999,6.0 L 49.99999999999999,20.0 A 30,30 0 0 0 25.310484023190313,32.958057598065324 Z" fill="#dc2626" />
+        <text x="50" y="47" text-anchor="middle" class="donut-pct">81%</text>
+        <text x="50" y="57" text-anchor="middle" class="donut-label">healthy</text>
+    </svg>
+            <div class="summary-metrics">
+                <div class="metric">
+                    <div class="metric-value" style="color:#16a34a;">84</div>
+                    <div class="metric-label">Verified Active</div>
+                </div>
+                <div class="metric">
+                    <div class="metric-value" style="color:#dc2626;">16</div>
+                    <div class="metric-label">Closed</div>
+                </div>
+                <div class="metric">
+                    <div class="metric-value" style="color:#b8860b;">4</div>
+                    <div class="metric-label">Needs Update</div>
+                </div>
+                <div class="metric">
+                    <div class="metric-value">104</div>
+                    <div class="metric-label">Total Checked</div>
+                </div>
+            </div>
+            <div class="health-bar">
+                <div class="health-bar-label">Board health</div>
+                <div class="health-bar-track">
+                    <div class="health-bar-seg" style="width:65.4%;background:#16a34a;"></div>
+                    <div class="health-bar-seg" style="width:15.4%;background:#65a30d;"></div>
+                    <div class="health-bar-seg" style="width:0.0%;background:#d1d5db;"></div>
+                    <div class="health-bar-seg" style="width:3.8%;background:#b8860b;"></div>
+                    <div class="health-bar-seg" style="width:15.4%;background:#dc2626;"></div>
+                </div>
+                <div class="legend">
+                    <div class="legend-item"><span class="legend-dot" style="background:#16a34a;"></span>Live</div>
+                    <div class="legend-item"><span class="legend-dot" style="background:#65a30d;"></span>Likely Live</div>
+                    <div class="legend-item"><span class="legend-dot" style="background:#b8860b;"></span>Needs Update</div>
+                    <div class="legend-item"><span class="legend-dot" style="background:#dc2626;"></span>Closed</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="toolbar">
+            <input type="text" class="search-box" placeholder="Filter..." oninput="filterTable()" id="searchBox">
+            <div class="sep"></div>
+            <span class="pill active" onclick="filterVerdict(this, 'ALL')">All <span class="ct">104</span></span>
+            <span class="pill" onclick="filterVerdict(this, 'CLOSED')">Closed <span class="ct">16</span></span>
+            <span class="pill" onclick="filterVerdict(this, 'NEEDS_UPDATE')">Needs Update <span class="ct">4</span></span>
+            <span class="pill" onclick="filterVerdict(this, 'UNCERTAIN')">Likely Live <span class="ct">16</span></span>
+            <span class="pill" onclick="filterVerdict(this, 'OPEN')">Live <span class="ct">68</span></span>
+            <span class="pill" onclick="filterVerdict(this, 'UNREACHABLE')">Unreachable <span class="ct">0</span></span>
+            <div class="toolbar-spacer"></div>
+            <div class="open-range">
+                <span class="open-range-label">Open</span>
+                <input type="number" id="rangeFrom" class="range-input" min="1" value="1">
+                <span class="open-range-label">&ndash;</span>
+                <input type="number" id="rangeTo" class="range-input" min="1" value="20">
+                <span class="open-range-label">of <span id="rangeTotal">0</span> links</span>
+                <span class="open-range-hint">(excludes mailto)</span>
+                <button class="btn btn-go" onclick="openRange()">
+                    <svg viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                    Go
+                </button>
+                <div class="increment-btns">
+                    <button class="pill-sm" onclick="openIncrement(5)">5</button>
+                    <button class="pill-sm" onclick="openIncrement(10)">10</button>
+                    <button class="pill-sm" onclick="openIncrement(15)">15</button>
+                    <button class="pill-sm" onclick="openIncrement(20)">20</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="table-wrap">
+            <table id="jobTable">
+                <thead>
+                    <tr>
+                        <th>Role</th>
+                        <th>Status</th>
+                        <th>Details</th>
+                        <th>URL</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    
+        <tr class="region-header">
+            <td colspan="5">
+                Remote <span class="region-count">(26)</span><span class="region-closed-badge">2 closed</span><span class="region-update-badge">1 needs update</span>
+            </td>
+        </tr>
+        <tr class="" data-verdict="UNCERTAIN">
+            <td class="col-role">
+                <span class="job-title">AI Generalist</span>
+                <span class="job-company">Generalist World</span>
+                <span class="job-location">Remote</span>
+            </td>
+            <td class="col-status">
+                <span class="badge" style="background:#65a30d;">Likely Live</span>
+            </td>
+            <td class="col-reason">Intermediary page — could not find or verify apply link</td>
+            <td class="col-link"><a href="https://generalist-world.notion.site/327d130df73a809bac58c4b9b5daf303?pvs=105" target="_blank" rel="noopener" title="https://generalist-world.notion.site/327d130df73a809bac58c4b9b5daf303?pvs=105">https://generalist-world.notion.site/327d130df73a809bac58c4b9b5daf303?pvs=105</a></td>
+        </tr>
+        <tr class="" data-verdict="OPEN">
+            <td class="col-role">
+                <span class="job-title">Growth Marketer</span>
+                <span class="job-company">Senja</span>
+                <span class="job-location">100% Remote (GMT/BST overlap)</span>
+            </td>
+            <td class="col-status">
+                <span class="badge" style="background:#16a34a;">Live</span>
+            </td>
+            <td class="col-reason">Active application mechanism found</td>
+            <td class="col-link"><a href="https://jobs.senja.io/" target="_blank" rel="noopener" title="https://jobs.senja.io/">https://jobs.senja.io/</a></td>
+        </tr>
+        <tr class="" data-verdict="OPEN">
+            <td class="col-role">
+                <span class="job-title">Unorthodox Communications</span>
+                <span class="job-company">Stripe</span>
+                <span class="job-location">San Francisco / London / New York</span>
+            </td>
+            <td class="col-status">
+                <span class="badge" style="background:#16a34a;">Live</span>
+            </td>
+            <td class="col-reason">Active application mechanism found</td>
+            <td class="col-link"><a href="https://stripe.com/jobs/listing/stripe-communications-open-application/7624667" target="_blank" rel="noopener" title="https://stripe.com/jobs/listing/stripe-communications-open-application/7624667">https://stripe.com/jobs/listing/stripe-communications-open-application/7624667</a></td>
+        </tr>
+        <tr class="" data-verdict="OPEN">
+            <td class="col-role">
+                <span class="job-title">Entrepreneur in Residence</span>
+                <span class="job-company">Melotech</span>
+                <span class="job-location">Remote (Berlin / London / LA / NYC / SF)</span>
+            </td>
+            <td class="col-status">
+                <span class="badge" style="background:#16a34a;">Live</span>
+            </td>
+            <td class="col-reason">Page loads with content, no closure signals</td>
+            <td class="col-link"><a href="https://jobs.ashbyhq.com/melotech/aae31236-bd17-4099-bb11-cb84569d91b0" target="_blank" rel="noopener" title="https://jobs.ashbyhq.com/melotech/aae31236-bd17-4099-bb11-cb84569d91b0">https://jobs.ashbyhq.com/melotech/aae31236-bd17-4099-bb11-cb84569d91b0</a></td>
+        </tr>
+        <tr class="" data-verdict="OPEN">
+            <td class="col-role">
+                <span class="job-title">Head of Media</span>
+                <span class="job-company">Circle</span>
+                <span class="job-location">Remote</span>
+            </td>
+            <td class="col-status">
+                <span class="badge" style="background:#16a34a;">Live</span>
+            </td>
+            <td class="col-reason">Page loads with content, no closure signals</td>
+            <td class="col-link"><a href="https://circle.so/careers/greenhouse--5081343008" target="_blank" rel="noopener" title="https://circle.so/careers/greenhouse--5081343008">https://circle.so/careers/greenhouse--5081343008</a></td>
+        </tr>
+        <tr class="" data-verdict="OPEN">
+            <td class="col-role">
+                <span class="job-title">Commercial Director</span>
+                <span class="job-company">The Marketing Meetup</span>
+                <span class="job-location">Remote UK</span>
+            </td>
+            <td class="col-status">
+                <span class="badge" style="background:#16a34a;">Live</span>
+            </td>
+            <td class="col-reason">Active application mechanism found</td>
+            <td class="col-link"><a href="https://themarketingmeetupjobs.com/job/2197523-commercial-director" target="_blank" rel="noopener" title="https://themarketingmeetupjobs.com/job/2197523-commercial-director">https://themarketingmeetupjobs.com/job/2197523-commercial-director</a></td>
+        </tr>
+        <tr class="" data-verdict="NEEDS_UPDATE">
+            <td class="col-role">
+                <span class="job-title">Director of Operations / COO</span>
+                <span class="job-company">Centre for Effective Altruism</span>
+                <span class="job-location">Remote / Oxford / SF</span>
+            </td>
+            <td class="col-status">
+                <span class="badge" style="background:#b8860b;">Needs Update</span>
+            </td>
+            <td class="col-reason">URL redirects to generic careers page — needs new link</td>
+            <td class="col-link"><a href="https://www.centreforeffectivealtruism.org/careers/head-of-operations" target="_blank" rel="noopener" title="https://www.centreforeffectivealtruism.org/careers/head-of-operations">https://www.centreforeffectivealtruism.org/careers/head-of-operations</a></td>
+        </tr>
+        <tr class="" data-verdict="OPEN">
+            <td class="col-role">
+                <span class="job-title">Community Program Manager</span>
+                <span class="job-company">Spikeball</span>
+                <span class="job-location">Remote US / Canada</span>
+            </td>
+            <td class="col-status">
+                <span class="badge" style="background:#16a34a;">Live</span>
+            </td>
+            <td class="col-reason">Page loads with content, no closure signals</td>
+            <td class="col-link"><a href="https://spikeball.bamboohr.com/careers/20?source=aWQ9MjA%3D" target="_blank" rel="noopener" title="https://spikeball.bamboohr.com/careers/20?source=aWQ9MjA%3D">https://spikeball.bamboohr.com/careers/20?source=aWQ9MjA%3D</a></td>
+        </tr>
+        <tr class="" data-verdict="OPEN">
+            <td class="col-role">
+                <span class="job-title">Data Science, Music & Audio</span>
+                <span class="job-company">Melotech</span>
+                <span class="job-location">Berlin / London / LA / NYC / SF</span>
+            </td>
+            <td class="col-status">
+                <span class="badge" style="background:#16a34a;">Live</span>
+            </td>
+            <td class="col-reason">Page loads with content, no closure signals</td>
+            <td class="col-link"><a href="https://jobs.ashbyhq.com/melotech/35bdfd24-a05f-4c2d-8c55-79d7b394499f" target="_blank" rel="noopener" title="https://jobs.ashbyhq.com/melotech/35bdfd24-a05f-4c2d-8c55-79d7b394499f">https://jobs.ashbyhq.com/melotech/35bdfd24-a05f-4c2d-8c55-79d7b394499f</a></td>
+        </tr>
+        <tr class="" data-verdict="OPEN">
+            <td class="col-role">
+                <span class="job-title">Ground Floor – Startup Operator Collective</span>
+                <span class="job-company">Hustle Fund</span>
+                <span class="job-location">Remote</span>
+            </td>
+            <td class="col-status">
+                <span class="badge" style="background:#16a34a;">Live</span>
+            </td>
+            <td class="col-reason">Page loads with content, no closure signals</td>
+            <td class="col-link"><a href="https://groundfloor.careers" target="_blank" rel="noopener" title="https://groundfloor.careers">https://groundfloor.careers</a></td>
+        </tr>
+        <tr class="" data-verdict="UNCERTAIN">
+            <td class="col-role">
+                <span class="job-title">Data-Leaning Product Engineer</span>
+                <span class="job-company">Trove</span>
+                <span class="job-location">Remote (periodic in-person)</span>
+            </td>
+            <td class="col-status">
+                <span class="badge" style="background:#65a30d;">Likely Live</span>
+            </td>
+            <td class="col-reason">Intermediary page — could not find or verify apply link</td>
+            <td class="col-link"><a href="https://trovewithin.notion.site/Data-Leaning-Product-Engineer-31ea0346862c80eba762e2e226a0ada8" target="_blank" rel="noopener" title="https://trovewithin.notion.site/Data-Leaning-Product-Engineer-31ea0346862c80eba762e2e226a0ada8">https://trovewithin.notion.site/Data-Leaning-Product-Engineer-31ea0346862c80e...</a></td>
+        </tr>
+        <tr class="" data-verdict="UNCERTAIN">
+            <td class="col-role">
+                <span class="job-title">Founding Product Designer</span>
+                <span class="job-company">Trove</span>
+                <span class="job-location">Remote (periodic in-person)</span>
+            </td>
+            <td class="col-status">
+                <span class="badge" style="background:#65a30d;">Likely Live</span>
+            </td>
+            <td class="col-reason">Intermediary page — could not find or verify apply link</td>
+            <td class="col-link"><a href="https://trovewithin.notion.site/Founding-Product-Designer-31ca0346862c8046b6c9f5feb5f6f31f" target="_blank" rel="noopener" title="https://trovewithin.notion.site/Founding-Product-Designer-31ca0346862c8046b6c9f5feb5f6f31f">https://trovewithin.notion.site/Founding-Product-Designer-31ca0346862c8046b6c...</a></td>
+        </tr>
+        <tr class="" data-verdict="UNCERTAIN">
+            <td class="col-role">
+                <span class="job-title">Executive Assistant</span>
+                <span class="job-company">Trove</span>
+                <span class="job-location">Remote (periodic in-person)</span>
+            </td>
+            <td class="col-status">
+                <span class="badge" style="background:#65a30d;">Likely Live</span>
+            </td>
+            <td class="col-reason">Intermediary page — could not find or verify apply link</td>
+            <td class="col-link"><a href="https://trovewithin.notion.site/Executive-Assistant-310a0346862c80588b91d4678d899b47" target="_blank" rel="noopener" title="https://trovewithin.notion.site/Executive-Assistant-310a0346862c80588b91d4678d899b47">https://trovewithin.notion.site/Executive-Assistant-310a0346862c80588b91d4678...</a></td>
+        </tr>
+        <tr class="" data-verdict="OPEN">
+            <td class="col-role">
+                <span class="job-title">GTM Engineer (Growth)</span>
+                <span class="job-company">Fireflies.ai</span>
+                <span class="job-location">Remote (Global)</span>
+            </td>
+            <td class="col-status">
+                <span class="badge" style="background:#16a34a;">Live</span>
+            </td>
+            <td class="col-reason">Page loads with content, no closure signals</td>
+            <td class="col-link"><a href="https://jobs.gem.com/fireflies/am9icG9zdDpWNlYsSQ9_lDifuStHJljB" target="_blank" rel="noopener" title="https://jobs.gem.com/fireflies/am9icG9zdDpWNlYsSQ9_lDifuStHJljB">https://jobs.gem.com/fireflies/am9icG9zdDpWNlYsSQ9_lDifuStHJljB</a></td>
+        </tr>
+        <tr class="" data-verdict="OPEN">
+            <td class="col-role">
+                <span class="job-title">Media Fellow</span>
+                <span class="job-company">Notion</span>
+                <span class="job-location">Remote</span>
+            </td>
+            <td class="col-status">
+                <span class="badge" style="background:#16a34a;">Live</span>
+            </td>
+            <td class="col-reason">Page loads with content, no closure signals</td>
+            <td class="col-link"><a href="https://notion.pages.dev.notion.co/cbe4bae104b64834a48eae8f33df5555" target="_blank" rel="noopener" title="https://notion.pages.dev.notion.co/cbe4bae104b64834a48eae8f33df5555">https://notion.pages.dev.notion.co/cbe4bae104b64834a48eae8f33df5555</a></td>
+        </tr>
+        <tr class="row-closed" data-verdict="CLOSED">
+            <td class="col-role">
+                <span class="job-title">Ghostwriter</span>
+                <span class="job-company">Media CoLab</span>
+                <span class="job-location">Remote (1-5pm GMT overlap)</span>
+            </td>
+            <td class="col-status">
+                <span class="badge" style="background:#dc2626;">Closed</span>
+            </td>
+            <td class="col-reason">Closed signal found: "applications closed"</td>
+            <td class="col-link"><a href="https://tally.so/r/WO86gL" target="_blank" rel="noopener" title="https://tally.so/r/WO86gL">https://tally.so/r/WO86gL</a></td>
+        </tr>
+        <tr class="" data-verdict="OPEN">
+            <td class="col-role">
+                <span class="job-title">Senior Product Marketing Manager</span>
+                <span class="job-company">Spark Advisors</span>
+                <span class="job-location">Remote</span>
+            </td>
+            <td class="col-status">
+                <span class="badge" style="background:#16a34a;">Live</span>
+            </td>
+            <td class="col-reason">Active application mechanism found</td>
+            <td class="col-link"><a href="https://job-boards.greenhouse.io/sparkadvisors/jobs/5153228008" target="_blank" rel="noopener" title="https://job-boards.greenhouse.io/sparkadvisors/jobs/5153228008">https://job-boards.greenhouse.io/sparkadvisors/jobs/5153228008</a></td>
+        </tr>
+        <tr class="" data-verdict="OPEN">
+            <td class="col-role">
+                <span class="job-title">Chief of Staff</span>
+                <span class="job-company">Decile Group</span>
+                <span class="job-location">Remote</span>
+            </td>
+            <td class="col-status">
+                <span class="badge" style="background:#16a34a;">Live</span>
+            </td>
+            <td class="col-reason">Active application mechanism found</td>
+            <td class="col-link"><a href="https://jobs.lever.co/decilegroup/0de25375-4971-4618-af1e-75914a3d1d6d" target="_blank" rel="noopener" title="https://jobs.lever.co/decilegroup/0de25375-4971-4618-af1e-75914a3d1d6d">https://jobs.lever.co/decilegroup/0de25375-4971-4618-af1e-75914a3d1d6d</a></td>
+        </tr>
+        <tr class="" data-verdict="UNCERTAIN">
+            <td class="col-role">
+                <span class="job-title">First Full-Time Hire</span>
+                <span class="job-company">Raven</span>
+                <span class="job-location">Remote</span>
+            </td>
+            <td class="col-status">
+                <span class="badge" style="background:#65a30d;">Likely Live</span>
+            </td>
+            <td class="col-reason">LinkedIn post — cannot verify without auth</td>
+            <td class="col-link"><a href="https://www.linkedin.com/posts/ognjenboskovic_im-hiring-the-first-ft-role-at-raven-a-share-7439975422299242498-lBuN" target="_blank" rel="noopener" title="https://www.linkedin.com/posts/ognjenboskovic_im-hiring-the-first-ft-role-at-raven-a-share-7439975422299242498-lBuN">https://www.linkedin.com/posts/ognjenboskovic_im-hiring-the-first-ft-role-at-...</a></td>
+        </tr>
+        <tr class="" data-verdict="OPEN">
+            <td class="col-role">
+                <span class="job-title">Product Engineer, Agent Identity & Observability</span>
+                <span class="job-company">Natural</span>
+                <span class="job-location">Remote</span>
+            </td>
+            <td class="col-status">
+                <span class="badge" style="background:#16a34a;">Live</span>
+            </td>
+            <td class="col-reason">Page loads with content, no closure signals</td>
+            <td class="col-link"><a href="https://www.natural.co/careers/product-engineer-agent-identity-observability" target="_blank" rel="noopener" title="https://www.natural.co/careers/product-engineer-agent-identity-observability">https://www.natural.co/careers/product-engineer-agent-identity-observability</a></td>
+        </tr>
+        <tr class="" data-verdict="OPEN">
+            <td class="col-role">
+                <span class="job-title">Member of Technical Staff – Agents</span>
+                <span class="job-company">Composio</span>
+                <span class="job-location">Remote</span>
+            </td>
+            <td class="col-status">
+                <span class="badge" style="background:#16a34a;">Live</span>
+            </td>
+            <td class="col-reason">Page loads with content, no closure signals</td>
+            <td class="col-link"><a href="https://jobs.ashbyhq.com/composio/519aef4c-7a15-4a62-8adf-e8150087aeca" target="_blank" rel="noopener" title="https://jobs.ashbyhq.com/composio/519aef4c-7a15-4a62-8adf-e8150087aeca">https://jobs.ashbyhq.com/composio/519aef4c-7a15-4a62-8adf-e8150087aeca</a></td>
+        </tr>
+        <tr class="row-closed" data-verdict="CLOSED">
+            <td class="col-role">
+                <span class="job-title">AI Ventures Accelerator Program Lead</span>
+                <span class="job-company">Technovation</span>
+                <span class="job-location">Remote (Global)</span>
+            </td>
+            <td class="col-status">
+                <span class="badge" style="background:#dc2626;">Closed</span>
+            </td>
+            <td class="col-reason">Apply form is closed (Google Forms /closedform)</td>
+            <td class="col-link"><a href="https://www.idealist.org/en/nonprofit-job/bf1498c121b64ac9a2ec6c07f7a45f00-ai-ve" target="_blank" rel="noopener" title="https://www.idealist.org/en/nonprofit-job/bf1498c121b64ac9a2ec6c07f7a45f00-ai-ve">https://www.idealist.org/en/nonprofit-job/bf1498c121b64ac9a2ec6c07f7a45f00-ai-ve</a></td>
+        </tr>
+        <tr class="" data-verdict="OPEN">
+            <td class="col-role">
+                <span class="job-title">Content Systems Architect</span>
+                <span class="job-company">CoLab Software</span>
+                <span class="job-location">Canada (Remote)</span>
+            </td>
+            <td class="col-status">
+                <span class="badge" style="background:#16a34a;">Live</span>
+            </td>
+            <td class="col-reason">Active application mechanism found</td>
+            <td class="col-link"><a href="https://job-boards.greenhouse.io/colabsoftware/jobs/5156149008" target="_blank" rel="noopener" title="https://job-boards.greenhouse.io/colabsoftware/jobs/5156149008">https://job-boards.greenhouse.io/colabsoftware/jobs/5156149008</a></td>
+        </tr>
+        <tr class="" data-verdict="OPEN">
+            <td class="col-role">
+                <span class="job-title">Creative Director – Southeast Asia</span>
+                <span class="job-company">Canva</span>
+                <span class="job-location">Singapore / Indonesia / Thailand / Philippines</span>
+            </td>
+            <td class="col-status">
+                <span class="badge" style="background:#16a34a;">Live</span>
+            </td>
+            <td class="col-reason">Active application mechanism found</td>
+            <td class="col-link"><a href="https://jobs.smartrecruiters.com/Canva/6000000000924815-creative-director-southe" target="_blank" rel="noopener" title="https://jobs.smartrecruiters.com/Canva/6000000000924815-creative-director-southe">https://jobs.smartrecruiters.com/Canva/6000000000924815-creative-director-southe</a></td>
+        </tr>
+        <tr class="" data-verdict="OPEN">
+            <td class="col-role">
+                <span class="job-title">Founding Operator</span>
+                <span class="job-company">Societies</span>
+                <span class="job-location">Remote</span>
+            </td>
+            <td class="col-status">
+                <span class="badge" style="background:#16a34a;">Live</span>
+            </td>
+            <td class="col-reason">Page loads with content, no closure signals</td>
+            <td class="col-link"><a href="https://societies.io/careers/founding-operator" target="_blank" rel="noopener" title="https://societies.io/careers/founding-operator">https://societies.io/careers/founding-operator</a></td>
+        </tr>
+        <tr class="" data-verdict="UNCERTAIN">
+            <td class="col-role">
+                <span class="job-title">Founding Operator</span>
+                <span class="job-company">Arctal AI</span>
+                <span class="job-location">Remote</span>
+            </td>
+            <td class="col-status">
+                <span class="badge" style="background:#65a30d;">Likely Live</span>
+            </td>
+            <td class="col-reason">Page content too minimal — may require JS rendering</td>
+            <td class="col-link"><a href="https://arctal.ai/hiring/founding-operator" target="_blank" rel="noopener" title="https://arctal.ai/hiring/founding-operator">https://arctal.ai/hiring/founding-operator</a></td>
+        </tr>
+        <tr class="region-header">
+            <td colspan="5">
+                United Kingdom <span class="region-count">(24)</span><span class="region-closed-badge">5 closed</span><span class="region-update-badge">1 needs update</span>
+            </td>
+        </tr>
+        <tr class="" data-verdict="OPEN">
+            <td class="col-role">
+                <span class="job-title">Head of Systems Change Practice Partnerships</span>
+                <span class="job-company">School of System Change</span>
+                <span class="job-location">London</span>
+            </td>
+            <td class="col-status">
+                <span class="badge" style="background:#16a34a;">Live</span>
+            </td>
+            <td class="col-reason">Active application mechanism found</td>
+            <td class="col-link"><a href="https://www.schoolofsystemchange.org/hiring-head-of-practice-partnerships" target="_blank" rel="noopener" title="https://www.schoolofsystemchange.org/hiring-head-of-practice-partnerships">https://www.schoolofsystemchange.org/hiring-head-of-practice-partnerships</a></td>
+        </tr>
+        <tr class="row-closed" data-verdict="CLOSED">
+            <td class="col-role">
+                <span class="job-title">Head of Strategy and Operations</span>
+                <span class="job-company">Department for Education (Policy Lab)</span>
+                <span class="job-location">Bristol / London / Manchester</span>
+            </td>
+            <td class="col-status">
+                <span class="badge" style="background:#dc2626;">Closed</span>
+            </td>
+            <td class="col-reason">HTTP 404 — page not found</td>
+            <td class="col-link"><a href="https://www.jobsgopublic.com/job/head-strategy-and-operations-45046" target="_blank" rel="noopener" title="https://www.jobsgopublic.com/job/head-strategy-and-operations-45046">https://www.jobsgopublic.com/job/head-strategy-and-operations-45046</a></td>
+        </tr>
+        <tr class="row-closed" data-verdict="CLOSED">
+            <td class="col-role">
+                <span class="job-title">Human Centred Designer</span>
+                <span class="job-company">Citizens Advice</span>
+                <span class="job-location">England & Wales</span>
+            </td>
+            <td class="col-status">
+                <span class="badge" style="background:#dc2626;">Closed</span>
+            </td>
+            <td class="col-reason">Role not found on any page of careers site</td>
+            <td class="col-link"><a href="https://www.citizensadvice.org.uk/about-us/job-and-voluntary-opportunities/" target="_blank" rel="noopener" title="https://www.citizensadvice.org.uk/about-us/job-and-voluntary-opportunities/">https://www.citizensadvice.org.uk/about-us/job-and-voluntary-opportunities/</a></td>
+        </tr>
+        <tr class="" data-verdict="UNCERTAIN">
+            <td class="col-role">
+                <span class="job-title">Operations & Delivery Coordinator</span>
+                <span class="job-company">NOT BAD FOR A GIRL</span>
+                <span class="job-location">London</span>
+            </td>
+            <td class="col-status">
+                <span class="badge" style="background:#65a30d;">Likely Live</span>
+            </td>
+            <td class="col-reason">Page content too minimal — may require JS rendering</td>
+            <td class="col-link"><a href="https://www.notbadforagirldj.com/news/articles/operations-and-delivery-coordinator" target="_blank" rel="noopener" title="https://www.notbadforagirldj.com/news/articles/operations-and-delivery-coordinator">https://www.notbadforagirldj.com/news/articles/operations-and-delivery-coordi...</a></td>
+        </tr>
+        <tr class="" data-verdict="NEEDS_UPDATE">
+            <td class="col-role">
+                <span class="job-title">National Network Manager</span>
+                <span class="job-company">The Leap</span>
+                <span class="job-location">Bradford / Remote UK</span>
+            </td>
+            <td class="col-status">
+                <span class="badge" style="background:#b8860b;">Needs Update</span>
+            </td>
+            <td class="col-reason">URL points to homepage — needs direct job link</td>
+            <td class="col-link"><a href="https://www.the-leap.org.uk/" target="_blank" rel="noopener" title="https://www.the-leap.org.uk/">https://www.the-leap.org.uk/</a></td>
+        </tr>
+        <tr class="" data-verdict="UNCERTAIN">
+            <td class="col-role">
+                <span class="job-title">Marketing Executive</span>
+                <span class="job-company">Botivo</span>
+                <span class="job-location">UK</span>
+            </td>
+            <td class="col-status">
+                <span class="badge" style="background:#65a30d;">Likely Live</span>
+            </td>
+            <td class="col-reason">LinkedIn post — cannot verify without auth</td>
+            <td class="col-link"><a href="https://www.linkedin.com/posts/immeermgassen_were-hiring-a-marketing-executive-at-activity-7432047170582687744-T9i0" target="_blank" rel="noopener" title="https://www.linkedin.com/posts/immeermgassen_were-hiring-a-marketing-executive-at-activity-7432047170582687744-T9i0">https://www.linkedin.com/posts/immeermgassen_were-hiring-a-marketing-executiv...</a></td>
+        </tr>
+        <tr class="row-closed" data-verdict="CLOSED">
+            <td class="col-role">
+                <span class="job-title">Head of Creative</span>
+                <span class="job-company">Finisterre</span>
+                <span class="job-location">Cornwall, UK</span>
+            </td>
+            <td class="col-status">
+                <span class="badge" style="background:#dc2626;">Closed</span>
+            </td>
+            <td class="col-reason">Role no longer listed on Workable board</td>
+            <td class="col-link"><a href="https://apply.workable.com/finisterre/" target="_blank" rel="noopener" title="https://apply.workable.com/finisterre/">https://apply.workable.com/finisterre/</a></td>
+        </tr>
+        <tr class="row-closed" data-verdict="CLOSED">
+            <td class="col-role">
+                <span class="job-title">Operations Officer</span>
+                <span class="job-company">GoodWork</span>
+                <span class="job-location">UK</span>
+            </td>
+            <td class="col-status">
+                <span class="badge" style="background:#dc2626;">Closed</span>
+            </td>
+            <td class="col-reason">Application form closed (Typeform no longer accepting submissions)</td>
+            <td class="col-link"><a href="https://goodworkuk.notion.site/Operations-Officer-30ad53cd8ea7800ebb2ce36de10d5920" target="_blank" rel="noopener" title="https://goodworkuk.notion.site/Operations-Officer-30ad53cd8ea7800ebb2ce36de10d5920">https://goodworkuk.notion.site/Operations-Officer-30ad53cd8ea7800ebb2ce36de10...</a></td>
+        </tr>
+        <tr class="" data-verdict="OPEN">
+            <td class="col-role">
+                <span class="job-title">GTM Lead</span>
+                <span class="job-company">Saturn (YC S24)</span>
+                <span class="job-location">London</span>
+            </td>
+            <td class="col-status">
+                <span class="badge" style="background:#16a34a;">Live</span>
+            </td>
+            <td class="col-reason">Page loads with content, no closure signals</td>
+            <td class="col-link"><a href="https://www.workatastartup.com/jobs/82353" target="_blank" rel="noopener" title="https://www.workatastartup.com/jobs/82353">https://www.workatastartup.com/jobs/82353</a></td>
+        </tr>
+        <tr class="" data-verdict="OPEN">
+            <td class="col-role">
+                <span class="job-title">Growth Lead</span>
+                <span class="job-company">Projects by IF</span>
+                <span class="job-location">London (Hybrid)</span>
+            </td>
+            <td class="col-status">
+                <span class="badge" style="background:#16a34a;">Live</span>
+            </td>
+            <td class="col-reason">Active application mechanism found</td>
+            <td class="col-link"><a href="https://jobs.ashbyhq.com/projectsbyif/975af666-8d1d-4587-a3d9-adc7c607200d" target="_blank" rel="noopener" title="https://jobs.ashbyhq.com/projectsbyif/975af666-8d1d-4587-a3d9-adc7c607200d">https://jobs.ashbyhq.com/projectsbyif/975af666-8d1d-4587-a3d9-adc7c607200d</a></td>
+        </tr>
+        <tr class="" data-verdict="OPEN">
+            <td class="col-role">
+                <span class="job-title">Global Community Manager</span>
+                <span class="job-company">Wise</span>
+                <span class="job-location">London</span>
+            </td>
+            <td class="col-status">
+                <span class="badge" style="background:#16a34a;">Live</span>
+            </td>
+            <td class="col-reason">Active application mechanism found</td>
+            <td class="col-link"><a href="https://wise.jobs/job/global-community-manager-in-london-jid-3172" target="_blank" rel="noopener" title="https://wise.jobs/job/global-community-manager-in-london-jid-3172">https://wise.jobs/job/global-community-manager-in-london-jid-3172</a></td>
+        </tr>
+        <tr class="" data-verdict="UNCERTAIN">
+            <td class="col-role">
+                <span class="job-title">Customer Success & Adoption Specialist</span>
+                <span class="job-company">Metadvice</span>
+                <span class="job-location">Brighton (Hybrid)</span>
+            </td>
+            <td class="col-status">
+                <span class="badge" style="background:#65a30d;">Likely Live</span>
+            </td>
+            <td class="col-reason">Email application — cannot verify</td>
+            <td class="col-link"><span class="muted">mailto:jobs-uk@metadvice.com</span></td>
+        </tr>
+        <tr class="" data-verdict="UNCERTAIN">
+            <td class="col-role">
+                <span class="job-title">Junior Brand / Marketing Exec</span>
+                <span class="job-company">All The Aunties</span>
+                <span class="job-location">London (Holborn, 4 days/week)</span>
+            </td>
+            <td class="col-status">
+                <span class="badge" style="background:#65a30d;">Likely Live</span>
+            </td>
+            <td class="col-reason">LinkedIn post — cannot verify without auth</td>
+            <td class="col-link"><a href="https://www.linkedin.com/posts/riya-patel35_we-are-hiring-were-want-that-special-number-share-7438221918752813058-WItO" target="_blank" rel="noopener" title="https://www.linkedin.com/posts/riya-patel35_we-are-hiring-were-want-that-special-number-share-7438221918752813058-WItO">https://www.linkedin.com/posts/riya-patel35_we-are-hiring-were-want-that-spec...</a></td>
+        </tr>
+        <tr class="" data-verdict="OPEN">
+            <td class="col-role">
+                <span class="job-title">Head of Adventure Expansion (Maternity Cover)</span>
+                <span class="job-company">Much Better Adventures</span>
+                <span class="job-location">UK-based</span>
+            </td>
+            <td class="col-status">
+                <span class="badge" style="background:#16a34a;">Live</span>
+            </td>
+            <td class="col-reason">Page loads with content, no closure signals</td>
+            <td class="col-link"><a href="https://apply.workable.com/muchbetteradventures/" target="_blank" rel="noopener" title="https://apply.workable.com/muchbetteradventures/">https://apply.workable.com/muchbetteradventures/</a></td>
+        </tr>
+        <tr class="row-closed" data-verdict="CLOSED">
+            <td class="col-role">
+                <span class="job-title">Creative Content Manager</span>
+                <span class="job-company">Gut Wealth</span>
+                <span class="job-location">Edinburgh</span>
+            </td>
+            <td class="col-status">
+                <span class="badge" style="background:#dc2626;">Closed</span>
+            </td>
+            <td class="col-reason">No longer accepting applications (LinkedIn)</td>
+            <td class="col-link"><a href="https://www.linkedin.com/jobs/view/4386378835/" target="_blank" rel="noopener" title="https://www.linkedin.com/jobs/view/4386378835/">https://www.linkedin.com/jobs/view/4386378835/</a></td>
+        </tr>
+        <tr class="" data-verdict="OPEN">
+            <td class="col-role">
+                <span class="job-title">Operations Manager</span>
+                <span class="job-company">Greenpixie</span>
+                <span class="job-location">London (hybrid, 2+ days/week)</span>
+            </td>
+            <td class="col-status">
+                <span class="badge" style="background:#16a34a;">Live</span>
+            </td>
+            <td class="col-reason">Active application mechanism found</td>
+            <td class="col-link"><a href="https://hosted-apply.jobtarget.com/job/Operations-Manager-BRZaGNFAMLnGVCYbDtrEmG" target="_blank" rel="noopener" title="https://hosted-apply.jobtarget.com/job/Operations-Manager-BRZaGNFAMLnGVCYbDtrEmG">https://hosted-apply.jobtarget.com/job/Operations-Manager-BRZaGNFAMLnGVCYbDtrEmG</a></td>
+        </tr>
+        <tr class="" data-verdict="OPEN">
+            <td class="col-role">
+                <span class="job-title">Operations & People Role</span>
+                <span class="job-company">Rebel</span>
+                <span class="job-location">UK</span>
+            </td>
+            <td class="col-status">
+                <span class="badge" style="background:#16a34a;">Live</span>
+            </td>
+            <td class="col-reason">Page loads with content, no closure signals</td>
+            <td class="col-link"><a href="https://rebel.bamboohr.com/careers/24" target="_blank" rel="noopener" title="https://rebel.bamboohr.com/careers/24">https://rebel.bamboohr.com/careers/24</a></td>
+        </tr>
+        <tr class="" data-verdict="OPEN">
+            <td class="col-role">
+                <span class="job-title">Founding GTM (AI Agents)</span>
+                <span class="job-company">Lottie</span>
+                <span class="job-location">London (Hybrid)</span>
+            </td>
+            <td class="col-status">
+                <span class="badge" style="background:#16a34a;">Live</span>
+            </td>
+            <td class="col-reason">Page loads with content, no closure signals</td>
+            <td class="col-link"><a href="https://jobs.ashbyhq.com/lottie/8a6838e6-4286-4145-b51b-03c50c9e0bad" target="_blank" rel="noopener" title="https://jobs.ashbyhq.com/lottie/8a6838e6-4286-4145-b51b-03c50c9e0bad">https://jobs.ashbyhq.com/lottie/8a6838e6-4286-4145-b51b-03c50c9e0bad</a></td>
+        </tr>
+        <tr class="" data-verdict="OPEN">
+            <td class="col-role">
+                <span class="job-title">Lead Coach – Found Programme</span>
+                <span class="job-company">Catch22</span>
+                <span class="job-location">London (Hybrid)</span>
+            </td>
+            <td class="col-status">
+                <span class="badge" style="background:#16a34a;">Live</span>
+            </td>
+            <td class="col-reason">Active application mechanism found</td>
+            <td class="col-link"><a href="https://www.smartrecruiters.com/Catch22/744000115619811-lead-coach-found" target="_blank" rel="noopener" title="https://www.smartrecruiters.com/Catch22/744000115619811-lead-coach-found">https://www.smartrecruiters.com/Catch22/744000115619811-lead-coach-found</a></td>
+        </tr>
+        <tr class="" data-verdict="OPEN">
+            <td class="col-role">
+                <span class="job-title">Project & Community Programme Administrator</span>
+                <span class="job-company">Iniva</span>
+                <span class="job-location">London</span>
+            </td>
+            <td class="col-status">
+                <span class="badge" style="background:#16a34a;">Live</span>
+            </td>
+            <td class="col-reason">Active application mechanism found</td>
+            <td class="col-link"><a href="https://iniva.org/about/vacancies/pcp-adminstrator/" target="_blank" rel="noopener" title="https://iniva.org/about/vacancies/pcp-adminstrator/">https://iniva.org/about/vacancies/pcp-adminstrator/</a></td>
+        </tr>
+        <tr class="" data-verdict="OPEN">
+            <td class="col-role">
+                <span class="job-title">Content Lead</span>
+                <span class="job-company">Granola</span>
+                <span class="job-location">London (Old Street, 5 days/week)</span>
+            </td>
+            <td class="col-status">
+                <span class="badge" style="background:#16a34a;">Live</span>
+            </td>
+            <td class="col-reason">Page loads with content, no closure signals</td>
+            <td class="col-link"><a href="https://jobs.ashbyhq.com/granola/44b8ce97-7919-4592-b33f-3f3275706dbe" target="_blank" rel="noopener" title="https://jobs.ashbyhq.com/granola/44b8ce97-7919-4592-b33f-3f3275706dbe">https://jobs.ashbyhq.com/granola/44b8ce97-7919-4592-b33f-3f3275706dbe</a></td>
+        </tr>
+        <tr class="" data-verdict="OPEN">
+            <td class="col-role">
+                <span class="job-title">Growth Coordinator</span>
+                <span class="job-company">B Lab UK</span>
+                <span class="job-location">UK</span>
+            </td>
+            <td class="col-status">
+                <span class="badge" style="background:#16a34a;">Live</span>
+            </td>
+            <td class="col-reason">Page loads with content, no closure signals</td>
+            <td class="col-link"><a href="https://app.beapplied.com/apply/0fcb8mlklk" target="_blank" rel="noopener" title="https://app.beapplied.com/apply/0fcb8mlklk">https://app.beapplied.com/apply/0fcb8mlklk</a></td>
+        </tr>
+        <tr class="" data-verdict="OPEN">
+            <td class="col-role">
+                <span class="job-title">Marketing Coordinator</span>
+                <span class="job-company">London LGBTQ+ Community Centre</span>
+                <span class="job-location">London</span>
+            </td>
+            <td class="col-status">
+                <span class="badge" style="background:#16a34a;">Live</span>
+            </td>
+            <td class="col-reason">Active application mechanism found</td>
+            <td class="col-link"><a href="https://londonlgbtqcentre.org/roles/join-the-team-marketing-coordinator/" target="_blank" rel="noopener" title="https://londonlgbtqcentre.org/roles/join-the-team-marketing-coordinator/">https://londonlgbtqcentre.org/roles/join-the-team-marketing-coordinator/</a></td>
+        </tr>
+        <tr class="" data-verdict="OPEN">
+            <td class="col-role">
+                <span class="job-title">Community Lead</span>
+                <span class="job-company">Forward Institute</span>
+                <span class="job-location">UK</span>
+            </td>
+            <td class="col-status">
+                <span class="badge" style="background:#16a34a;">Live</span>
+            </td>
+            <td class="col-reason">Active application mechanism found</td>
+            <td class="col-link"><a href="https://forward-institute.jobs.personio.com/job/2563526?_pc=590124" target="_blank" rel="noopener" title="https://forward-institute.jobs.personio.com/job/2563526?_pc=590124">https://forward-institute.jobs.personio.com/job/2563526?_pc=590124</a></td>
+        </tr>
+        <tr class="region-header">
+            <td colspan="5">
+                United States & Canada <span class="region-count">(21)</span><span class="region-closed-badge">1 closed</span><span class="region-update-badge">1 needs update</span>
+            </td>
+        </tr>
+        <tr class="" data-verdict="UNCERTAIN">
+            <td class="col-role">
+                <span class="job-title">Senior Director, Creative Marketing</span>
+                <span class="job-company">Duolingo</span>
+                <span class="job-location">New York / London</span>
+            </td>
+            <td class="col-status">
+                <span class="badge" style="background:#65a30d;">Likely Live</span>
+            </td>
+            <td class="col-reason">Page content too minimal — may require JS rendering</td>
+            <td class="col-link"><a href="https://careers.duolingo.com/jobs/8442932002" target="_blank" rel="noopener" title="https://careers.duolingo.com/jobs/8442932002">https://careers.duolingo.com/jobs/8442932002</a></td>
+        </tr>
+        <tr class="" data-verdict="OPEN">
+            <td class="col-role">
+                <span class="job-title">AI Developer Advocate</span>
+                <span class="job-company">Mistral AI</span>
+                <span class="job-location">New York / Palo Alto</span>
+            </td>
+            <td class="col-status">
+                <span class="badge" style="background:#16a34a;">Live</span>
+            </td>
+            <td class="col-reason">Active application mechanism found</td>
+            <td class="col-link"><a href="https://jobs.lever.co/mistral/b56f6523-b7d2-47a3-abe6-2c793c7672fc" target="_blank" rel="noopener" title="https://jobs.lever.co/mistral/b56f6523-b7d2-47a3-abe6-2c793c7672fc">https://jobs.lever.co/mistral/b56f6523-b7d2-47a3-abe6-2c793c7672fc</a></td>
+        </tr>
+        <tr class="" data-verdict="OPEN">
+            <td class="col-role">
+                <span class="job-title">Senior PMM — Roadmap Narrative & Release Strategy</span>
+                <span class="job-company">Docusign</span>
+                <span class="job-location">SF / Seattle / Chicago</span>
+            </td>
+            <td class="col-status">
+                <span class="badge" style="background:#16a34a;">Live</span>
+            </td>
+            <td class="col-reason">Active application mechanism found</td>
+            <td class="col-link"><a href="https://careers.docusign.com/jobs/28885?lang=en-us&previousLocale=en-US" target="_blank" rel="noopener" title="https://careers.docusign.com/jobs/28885?lang=en-us&previousLocale=en-US">https://careers.docusign.com/jobs/28885?lang=en-us&previousLocale=en-US</a></td>
+        </tr>
+        <tr class="" data-verdict="OPEN">
+            <td class="col-role">
+                <span class="job-title">Sr Product Marketing Manager</span>
+                <span class="job-company">Community Phone</span>
+                <span class="job-location">Remote US</span>
+            </td>
+            <td class="col-status">
+                <span class="badge" style="background:#16a34a;">Live</span>
+            </td>
+            <td class="col-reason">Active application mechanism found</td>
+            <td class="col-link"><a href="https://ats.rippling.com/community-phone-careers/jobs/b0b1ec9b-6161-483b-99ac-c4c7bc1bd248" target="_blank" rel="noopener" title="https://ats.rippling.com/community-phone-careers/jobs/b0b1ec9b-6161-483b-99ac-c4c7bc1bd248">https://ats.rippling.com/community-phone-careers/jobs/b0b1ec9b-6161-483b-99ac...</a></td>
+        </tr>
+        <tr class="" data-verdict="NEEDS_UPDATE">
+            <td class="col-role">
+                <span class="job-title">Director of Product Marketing</span>
+                <span class="job-company">ComPsych</span>
+                <span class="job-location">Remote US</span>
+            </td>
+            <td class="col-status">
+                <span class="badge" style="background:#b8860b;">Needs Update</span>
+            </td>
+            <td class="col-reason">URL points to generic careers page — needs direct job link</td>
+            <td class="col-link"><a href="https://www.compsych.com/careers/" target="_blank" rel="noopener" title="https://www.compsych.com/careers/">https://www.compsych.com/careers/</a></td>
+        </tr>
+        <tr class="" data-verdict="UNCERTAIN">
+            <td class="col-role">
+                <span class="job-title">Chief Growth Officer</span>
+                <span class="job-company">Attune</span>
+                <span class="job-location">Remote North America</span>
+            </td>
+            <td class="col-status">
+                <span class="badge" style="background:#65a30d;">Likely Live</span>
+            </td>
+            <td class="col-reason">LinkedIn post — cannot verify without auth</td>
+            <td class="col-link"><a href="https://www.linkedin.com/posts/andybandyopadhyay_financialhealth-hiring-chiefgrowthofficer-activity-7434970802065821696-9885" target="_blank" rel="noopener" title="https://www.linkedin.com/posts/andybandyopadhyay_financialhealth-hiring-chiefgrowthofficer-activity-7434970802065821696-9885">https://www.linkedin.com/posts/andybandyopadhyay_financialhealth-hiring-chief...</a></td>
+        </tr>
+        <tr class="" data-verdict="OPEN">
+            <td class="col-role">
+                <span class="job-title">VP Development & Strategic Partnerships</span>
+                <span class="job-company">Springboard</span>
+                <span class="job-location">US</span>
+            </td>
+            <td class="col-status">
+                <span class="badge" style="background:#16a34a;">Live</span>
+            </td>
+            <td class="col-reason">Active application mechanism found</td>
+            <td class="col-link"><a href="https://springboardenterprises.applytojob.com/apply/9sXXJOlE6B/Vice-President-Development-And-Strategic-Partnerships" target="_blank" rel="noopener" title="https://springboardenterprises.applytojob.com/apply/9sXXJOlE6B/Vice-President-Development-And-Strategic-Partnerships">https://springboardenterprises.applytojob.com/apply/9sXXJOlE6B/Vice-President...</a></td>
+        </tr>
+        <tr class="" data-verdict="OPEN">
+            <td class="col-role">
+                <span class="job-title">Content Marketing Lead</span>
+                <span class="job-company">Ambrook</span>
+                <span class="job-location">Remote US</span>
+            </td>
+            <td class="col-status">
+                <span class="badge" style="background:#16a34a;">Live</span>
+            </td>
+            <td class="col-reason">Page loads with content, no closure signals</td>
+            <td class="col-link"><a href="https://jobs.ashbyhq.com/ambrook/01dc1538-4d95-45dc-841a-798342ef353e" target="_blank" rel="noopener" title="https://jobs.ashbyhq.com/ambrook/01dc1538-4d95-45dc-841a-798342ef353e">https://jobs.ashbyhq.com/ambrook/01dc1538-4d95-45dc-841a-798342ef353e</a></td>
+        </tr>
+        <tr class="" data-verdict="OPEN">
+            <td class="col-role">
+                <span class="job-title">Product Operations PM</span>
+                <span class="job-company">Quizlet</span>
+                <span class="job-location">San Francisco / NYC</span>
+            </td>
+            <td class="col-status">
+                <span class="badge" style="background:#16a34a;">Live</span>
+            </td>
+            <td class="col-reason">Active application mechanism found</td>
+            <td class="col-link"><a href="https://jobs.lever.co/quizlet-2/de0fb1c5-0d2c-4a02-940c-db161c94e47c" target="_blank" rel="noopener" title="https://jobs.lever.co/quizlet-2/de0fb1c5-0d2c-4a02-940c-db161c94e47c">https://jobs.lever.co/quizlet-2/de0fb1c5-0d2c-4a02-940c-db161c94e47c</a></td>
+        </tr>
+        <tr class="" data-verdict="OPEN">
+            <td class="col-role">
+                <span class="job-title">Founder's Associate</span>
+                <span class="job-company">Arcline (YC W26)</span>
+                <span class="job-location">San Francisco / New York</span>
+            </td>
+            <td class="col-status">
+                <span class="badge" style="background:#16a34a;">Live</span>
+            </td>
+            <td class="col-reason">Page loads with content, no closure signals</td>
+            <td class="col-link"><a href="https://www.workatastartup.com/jobs/91264" target="_blank" rel="noopener" title="https://www.workatastartup.com/jobs/91264">https://www.workatastartup.com/jobs/91264</a></td>
+        </tr>
+        <tr class="" data-verdict="OPEN">
+            <td class="col-role">
+                <span class="job-title">Special Projects Operator</span>
+                <span class="job-company">Idler (YC S25)</span>
+                <span class="job-location">San Francisco</span>
+            </td>
+            <td class="col-status">
+                <span class="badge" style="background:#16a34a;">Live</span>
+            </td>
+            <td class="col-reason">Page loads with content, no closure signals</td>
+            <td class="col-link"><a href="https://www.workatastartup.com/jobs/90301" target="_blank" rel="noopener" title="https://www.workatastartup.com/jobs/90301">https://www.workatastartup.com/jobs/90301</a></td>
+        </tr>
+        <tr class="" data-verdict="OPEN">
+            <td class="col-role">
+                <span class="job-title">Founding Strategy & Operations Lead</span>
+                <span class="job-company">AgentMail (YC S25)</span>
+                <span class="job-location">San Francisco</span>
+            </td>
+            <td class="col-status">
+                <span class="badge" style="background:#16a34a;">Live</span>
+            </td>
+            <td class="col-reason">Page loads with content, no closure signals</td>
+            <td class="col-link"><a href="https://www.workatastartup.com/jobs/86118" target="_blank" rel="noopener" title="https://www.workatastartup.com/jobs/86118">https://www.workatastartup.com/jobs/86118</a></td>
+        </tr>
+        <tr class="" data-verdict="OPEN">
+            <td class="col-role">
+                <span class="job-title">Special Projects Lead</span>
+                <span class="job-company">Harper (YC W25)</span>
+                <span class="job-location">San Francisco</span>
+            </td>
+            <td class="col-status">
+                <span class="badge" style="background:#16a34a;">Live</span>
+            </td>
+            <td class="col-reason">Page loads with content, no closure signals</td>
+            <td class="col-link"><a href="https://www.workatastartup.com/jobs/89006" target="_blank" rel="noopener" title="https://www.workatastartup.com/jobs/89006">https://www.workatastartup.com/jobs/89006</a></td>
+        </tr>
+        <tr class="" data-verdict="OPEN">
+            <td class="col-role">
+                <span class="job-title">Marketing Generalist</span>
+                <span class="job-company">FurtherAI (YC W24)</span>
+                <span class="job-location">San Francisco</span>
+            </td>
+            <td class="col-status">
+                <span class="badge" style="background:#16a34a;">Live</span>
+            </td>
+            <td class="col-reason">Page loads with content, no closure signals</td>
+            <td class="col-link"><a href="https://www.workatastartup.com/jobs/86029" target="_blank" rel="noopener" title="https://www.workatastartup.com/jobs/86029">https://www.workatastartup.com/jobs/86029</a></td>
+        </tr>
+        <tr class="" data-verdict="OPEN">
+            <td class="col-role">
+                <span class="job-title">AI Researcher</span>
+                <span class="job-company">arnata</span>
+                <span class="job-location">San Francisco / Remote</span>
+            </td>
+            <td class="col-status">
+                <span class="badge" style="background:#16a34a;">Live</span>
+            </td>
+            <td class="col-reason">Page loads with content, no closure signals</td>
+            <td class="col-link"><a href="https://www.workatastartup.com/jobs/76900" target="_blank" rel="noopener" title="https://www.workatastartup.com/jobs/76900">https://www.workatastartup.com/jobs/76900</a></td>
+        </tr>
+        <tr class="" data-verdict="OPEN">
+            <td class="col-role">
+                <span class="job-title">Lead Learning Designer</span>
+                <span class="job-company">Speak</span>
+                <span class="job-location">San Francisco / Remote</span>
+            </td>
+            <td class="col-status">
+                <span class="badge" style="background:#16a34a;">Live</span>
+            </td>
+            <td class="col-reason">Page loads with content, no closure signals</td>
+            <td class="col-link"><a href="https://jobs.ashbyhq.com/speak/c4695a46-cffe-4e6e-8792-59b2c5270db7" target="_blank" rel="noopener" title="https://jobs.ashbyhq.com/speak/c4695a46-cffe-4e6e-8792-59b2c5270db7">https://jobs.ashbyhq.com/speak/c4695a46-cffe-4e6e-8792-59b2c5270db7</a></td>
+        </tr>
+        <tr class="" data-verdict="OPEN">
+            <td class="col-role">
+                <span class="job-title">Product Designer</span>
+                <span class="job-company">Decoda Health</span>
+                <span class="job-location">Toronto / Remote Canada</span>
+            </td>
+            <td class="col-status">
+                <span class="badge" style="background:#16a34a;">Live</span>
+            </td>
+            <td class="col-reason">Page loads with content, no closure signals</td>
+            <td class="col-link"><a href="https://www.workatastartup.com/jobs/89573" target="_blank" rel="noopener" title="https://www.workatastartup.com/jobs/89573">https://www.workatastartup.com/jobs/89573</a></td>
+        </tr>
+        <tr class="" data-verdict="OPEN">
+            <td class="col-role">
+                <span class="job-title">Network Engagement Specialist</span>
+                <span class="job-company">Harvard Innovation Labs</span>
+                <span class="job-location">Boston, MA (Hybrid)</span>
+            </td>
+            <td class="col-status">
+                <span class="badge" style="background:#16a34a;">Live</span>
+            </td>
+            <td class="col-reason">Active application mechanism found</td>
+            <td class="col-link"><a href="https://careers.harvard.edu/job/network-engagement-specialist-harvard-innovation-labs-in-boston-ma-united-states-jid-1163" target="_blank" rel="noopener" title="https://careers.harvard.edu/job/network-engagement-specialist-harvard-innovation-labs-in-boston-ma-united-states-jid-1163">https://careers.harvard.edu/job/network-engagement-specialist-harvard-innovat...</a></td>
+        </tr>
+        <tr class="row-closed" data-verdict="CLOSED">
+            <td class="col-role">
+                <span class="job-title">Associate, Membership & Portfolio Services</span>
+                <span class="job-company">Gaingels</span>
+                <span class="job-location">Remote (NYC preferred)</span>
+            </td>
+            <td class="col-status">
+                <span class="badge" style="background:#dc2626;">Closed</span>
+            </td>
+            <td class="col-reason">HTTP 404 — page not found</td>
+            <td class="col-link"><a href="https://airtable.com/app5yYmLTYhtWXJ44/shr6nCyBDvW7cpkFF" target="_blank" rel="noopener" title="https://airtable.com/app5yYmLTYhtWXJ44/shr6nCyBDvW7cpkFF">https://airtable.com/app5yYmLTYhtWXJ44/shr6nCyBDvW7cpkFF</a></td>
+        </tr>
+        <tr class="" data-verdict="OPEN">
+            <td class="col-role">
+                <span class="job-title">Chief Operating Officer</span>
+                <span class="job-company">Work for America</span>
+                <span class="job-location">New York, NY (Remote-first)</span>
+            </td>
+            <td class="col-status">
+                <span class="badge" style="background:#16a34a;">Live</span>
+            </td>
+            <td class="col-reason">Active application mechanism found</td>
+            <td class="col-link"><a href="https://www.workforamerica.org/careers-backend/chief-operating-officer" target="_blank" rel="noopener" title="https://www.workforamerica.org/careers-backend/chief-operating-officer">https://www.workforamerica.org/careers-backend/chief-operating-officer</a></td>
+        </tr>
+        <tr class="" data-verdict="OPEN">
+            <td class="col-role">
+                <span class="job-title">Head of AI Strategic Initiatives</span>
+                <span class="job-company">Vannin Chief of Staff</span>
+                <span class="job-location">NYC (Hybrid) or London</span>
+            </td>
+            <td class="col-status">
+                <span class="badge" style="background:#16a34a;">Live</span>
+            </td>
+            <td class="col-reason">Active application mechanism found</td>
+            <td class="col-link"><a href="https://careers.vanninchiefofstaff.com/jobs/566900-head-of-ai-strategic-initiatives" target="_blank" rel="noopener" title="https://careers.vanninchiefofstaff.com/jobs/566900-head-of-ai-strategic-initiatives">https://careers.vanninchiefofstaff.com/jobs/566900-head-of-ai-strategic-initi...</a></td>
+        </tr>
+        <tr class="region-header">
+            <td colspan="5">
+                Europe <span class="region-count">(10)</span><span class="region-closed-badge">1 closed</span><span class="region-update-badge">1 needs update</span>
+            </td>
+        </tr>
+        <tr class="" data-verdict="NEEDS_UPDATE">
+            <td class="col-role">
+                <span class="job-title">Chief of Staff</span>
+                <span class="job-company">BeAngels</span>
+                <span class="job-location">Belgium</span>
+            </td>
+            <td class="col-status">
+                <span class="badge" style="background:#b8860b;">Needs Update</span>
+            </td>
+            <td class="col-reason">URL points to homepage — better link available on LinkedIn</td>
+            <td class="col-link"><a href="https://www.beangels.eu/en" target="_blank" rel="noopener" title="https://www.beangels.eu/en">https://www.beangels.eu/en</a></td>
+        </tr>
+        <tr class="" data-verdict="OPEN">
+            <td class="col-role">
+                <span class="job-title">Chief Operating Officer — Europe</span>
+                <span class="job-company">ClearBank</span>
+                <span class="job-location">Amsterdam, Netherlands</span>
+            </td>
+            <td class="col-status">
+                <span class="badge" style="background:#16a34a;">Live</span>
+            </td>
+            <td class="col-reason">Active application mechanism found</td>
+            <td class="col-link"><a href="https://clear.bank/join-clearbank" target="_blank" rel="noopener" title="https://clear.bank/join-clearbank">https://clear.bank/join-clearbank</a></td>
+        </tr>
+        <tr class="" data-verdict="OPEN">
+            <td class="col-role">
+                <span class="job-title">Innovation Manager</span>
+                <span class="job-company">Zelty</span>
+                <span class="job-location">Paris, France</span>
+            </td>
+            <td class="col-status">
+                <span class="badge" style="background:#16a34a;">Live</span>
+            </td>
+            <td class="col-reason">Active application mechanism found</td>
+            <td class="col-link"><a href="https://www.welcometothejungle.com/fr/companies/zelty/jobs/innovation-manager_paris" target="_blank" rel="noopener" title="https://www.welcometothejungle.com/fr/companies/zelty/jobs/innovation-manager_paris">https://www.welcometothejungle.com/fr/companies/zelty/jobs/innovation-manager...</a></td>
+        </tr>
+        <tr class="" data-verdict="OPEN">
+            <td class="col-role">
+                <span class="job-title">Founding GTM</span>
+                <span class="job-company">Emfas</span>
+                <span class="job-location">Stockholm, Sweden</span>
+            </td>
+            <td class="col-status">
+                <span class="badge" style="background:#16a34a;">Live</span>
+            </td>
+            <td class="col-reason">Active application mechanism found</td>
+            <td class="col-link"><a href="https://careers.emfas.ai/jobs/7284492-founding-gtm" target="_blank" rel="noopener" title="https://careers.emfas.ai/jobs/7284492-founding-gtm">https://careers.emfas.ai/jobs/7284492-founding-gtm</a></td>
+        </tr>
+        <tr class="" data-verdict="OPEN">
+            <td class="col-role">
+                <span class="job-title">Head of Community</span>
+                <span class="job-company">Lovable</span>
+                <span class="job-location">Stockholm (Remote available)</span>
+            </td>
+            <td class="col-status">
+                <span class="badge" style="background:#16a34a;">Live</span>
+            </td>
+            <td class="col-reason">Active application mechanism found</td>
+            <td class="col-link"><a href="https://jobs.ashbyhq.com/lovable/da5a2b53-72af-4f6b-b1bc-03512a8d2c9e" target="_blank" rel="noopener" title="https://jobs.ashbyhq.com/lovable/da5a2b53-72af-4f6b-b1bc-03512a8d2c9e">https://jobs.ashbyhq.com/lovable/da5a2b53-72af-4f6b-b1bc-03512a8d2c9e</a></td>
+        </tr>
+        <tr class="" data-verdict="OPEN">
+            <td class="col-role">
+                <span class="job-title">Product Manager – Europe</span>
+                <span class="job-company">Ghost</span>
+                <span class="job-location">Remote (UTC-0 to UTC+2)</span>
+            </td>
+            <td class="col-status">
+                <span class="badge" style="background:#16a34a;">Live</span>
+            </td>
+            <td class="col-reason">Active application mechanism found</td>
+            <td class="col-link"><a href="https://careers.ghost.org/product-manager-europe/en" target="_blank" rel="noopener" title="https://careers.ghost.org/product-manager-europe/en">https://careers.ghost.org/product-manager-europe/en</a></td>
+        </tr>
+        <tr class="row-closed" data-verdict="CLOSED">
+            <td class="col-role">
+                <span class="job-title">Operations Lead (Business / People Operations)</span>
+                <span class="job-company">7people</span>
+                <span class="job-location">Amsterdam (on-site)</span>
+            </td>
+            <td class="col-status">
+                <span class="badge" style="background:#dc2626;">Closed</span>
+            </td>
+            <td class="col-reason">HTTP 404 — page not found</td>
+            <td class="col-link"><a href="https://careers.7people.team/o/operations-lead-business-people-operations" target="_blank" rel="noopener" title="https://careers.7people.team/o/operations-lead-business-people-operations">https://careers.7people.team/o/operations-lead-business-people-operations</a></td>
+        </tr>
+        <tr class="" data-verdict="OPEN">
+            <td class="col-role">
+                <span class="job-title">Chief of Staff</span>
+                <span class="job-company">Gorilla</span>
+                <span class="job-location">Antwerp, Belgium (Hybrid)</span>
+            </td>
+            <td class="col-status">
+                <span class="badge" style="background:#16a34a;">Live</span>
+            </td>
+            <td class="col-reason">Page loads with content, no closure signals</td>
+            <td class="col-link"><a href="https://www.gorilla.co/careers/chief-of-staff" target="_blank" rel="noopener" title="https://www.gorilla.co/careers/chief-of-staff">https://www.gorilla.co/careers/chief-of-staff</a></td>
+        </tr>
+        <tr class="" data-verdict="OPEN">
+            <td class="col-role">
+                <span class="job-title">Generalist / Researcher in Residence on Social Impact</span>
+                <span class="job-company">Waag Futurelab</span>
+                <span class="job-location">Netherlands / Remote</span>
+            </td>
+            <td class="col-status">
+                <span class="badge" style="background:#16a34a;">Live</span>
+            </td>
+            <td class="col-reason">Active application mechanism found</td>
+            <td class="col-link"><a href="https://waag.homerun.co/generalist-researcher-in-residence-on-social-impact/nl" target="_blank" rel="noopener" title="https://waag.homerun.co/generalist-researcher-in-residence-on-social-impact/nl">https://waag.homerun.co/generalist-researcher-in-residence-on-social-impact/nl</a></td>
+        </tr>
+        <tr class="" data-verdict="OPEN">
+            <td class="col-role">
+                <span class="job-title">Internship – Marketing, Operations & Partnerships</span>
+                <span class="job-company">Deep Tech Momentum</span>
+                <span class="job-location">Berlin</span>
+            </td>
+            <td class="col-status">
+                <span class="badge" style="background:#16a34a;">Live</span>
+            </td>
+            <td class="col-reason">Page loads with content, no closure signals</td>
+            <td class="col-link"><a href="https://dtm-jobs.super.site/internship-2-12-weeks" target="_blank" rel="noopener" title="https://dtm-jobs.super.site/internship-2-12-weeks">https://dtm-jobs.super.site/internship-2-12-weeks</a></td>
+        </tr>
+        <tr class="region-header">
+            <td colspan="5">
+                Asia Pacific <span class="region-count">(5)</span><span class="region-closed-badge">2 closed</span>
+            </td>
+        </tr>
+        <tr class="row-closed" data-verdict="CLOSED">
+            <td class="col-role">
+                <span class="job-title">AI Engineer</span>
+                <span class="job-company">heva</span>
+                <span class="job-location">Remote India / LATAM</span>
+            </td>
+            <td class="col-status">
+                <span class="badge" style="background:#dc2626;">Closed</span>
+            </td>
+            <td class="col-reason">Role not found on company hiring page</td>
+            <td class="col-link"><a href="https://heva.co/" target="_blank" rel="noopener" title="https://heva.co/">https://heva.co/</a></td>
+        </tr>
+        <tr class="" data-verdict="UNCERTAIN">
+            <td class="col-role">
+                <span class="job-title">Implementation & Ops Lead</span>
+                <span class="job-company">Acme Technology</span>
+                <span class="job-location">APAC</span>
+            </td>
+            <td class="col-status">
+                <span class="badge" style="background:#65a30d;">Likely Live</span>
+            </td>
+            <td class="col-reason">LinkedIn post — cannot verify without auth</td>
+            <td class="col-link"><a href="https://www.linkedin.com/posts/jxlye_hiring-fintech-bankconnectivity-activity-7434526447798493184-2374" target="_blank" rel="noopener" title="https://www.linkedin.com/posts/jxlye_hiring-fintech-bankconnectivity-activity-7434526447798493184-2374">https://www.linkedin.com/posts/jxlye_hiring-fintech-bankconnectivity-activity...</a></td>
+        </tr>
+        <tr class="" data-verdict="UNCERTAIN">
+            <td class="col-role">
+                <span class="job-title">Chief of Staff</span>
+                <span class="job-company">Neocrete</span>
+                <span class="job-location">Auckland, NZ</span>
+            </td>
+            <td class="col-status">
+                <span class="badge" style="background:#65a30d;">Likely Live</span>
+            </td>
+            <td class="col-reason">LinkedIn post — cannot verify without auth</td>
+            <td class="col-link"><a href="https://www.linkedin.com/posts/samanthapiane_concrete-is-the-most-used-product-in-the-activity-7432986694733279232-OHgY" target="_blank" rel="noopener" title="https://www.linkedin.com/posts/samanthapiane_concrete-is-the-most-used-product-in-the-activity-7432986694733279232-OHgY">https://www.linkedin.com/posts/samanthapiane_concrete-is-the-most-used-produc...</a></td>
+        </tr>
+        <tr class="row-closed" data-verdict="CLOSED">
+            <td class="col-role">
+                <span class="job-title">Chief of Staff</span>
+                <span class="job-company">RISE</span>
+                <span class="job-location">Bangkok, Thailand</span>
+            </td>
+            <td class="col-status">
+                <span class="badge" style="background:#dc2626;">Closed</span>
+            </td>
+            <td class="col-reason">Closed signal found: "no longer accepting applications"</td>
+            <td class="col-link"><a href="https://www.linkedin.com/jobs/view/4375312536/" target="_blank" rel="noopener" title="https://www.linkedin.com/jobs/view/4375312536/">https://www.linkedin.com/jobs/view/4375312536/</a></td>
+        </tr>
+        <tr class="" data-verdict="OPEN">
+            <td class="col-role">
+                <span class="job-title">Startup Field Marketing Manager</span>
+                <span class="job-company">Stripe</span>
+                <span class="job-location">Sydney, Australia</span>
+            </td>
+            <td class="col-status">
+                <span class="badge" style="background:#16a34a;">Live</span>
+            </td>
+            <td class="col-reason">Active application mechanism found</td>
+            <td class="col-link"><a href="https://stripe.com/jobs/listing/startup-field-marketing-manager-aunz/7645717" target="_blank" rel="noopener" title="https://stripe.com/jobs/listing/startup-field-marketing-manager-aunz/7645717">https://stripe.com/jobs/listing/startup-field-marketing-manager-aunz/7645717</a></td>
+        </tr>
+        <tr class="region-header">
+            <td colspan="5">
+                Part-Time & Contract <span class="region-count">(7)</span><span class="region-closed-badge">2 closed</span>
+            </td>
+        </tr>
+        <tr class="row-closed" data-verdict="CLOSED">
+            <td class="col-role">
+                <span class="job-title">Fractional Chief of Staff</span>
+                <span class="job-company">Strange Ventures</span>
+                <span class="job-location">San Francisco</span>
+            </td>
+            <td class="col-status">
+                <span class="badge" style="background:#dc2626;">Closed</span>
+            </td>
+            <td class="col-reason">Apply form is closed (Google Forms /closedform)</td>
+            <td class="col-link"><a href="https://thereview.strangevc.com/p/were-hiring-fractional-chief-of-staff" target="_blank" rel="noopener" title="https://thereview.strangevc.com/p/were-hiring-fractional-chief-of-staff">https://thereview.strangevc.com/p/were-hiring-fractional-chief-of-staff</a></td>
+        </tr>
+        <tr class="" data-verdict="OPEN">
+            <td class="col-role">
+                <span class="job-title">Creative Project Manager</span>
+                <span class="job-company">Rapha</span>
+                <span class="job-location">London</span>
+            </td>
+            <td class="col-status">
+                <span class="badge" style="background:#16a34a;">Live</span>
+            </td>
+            <td class="col-reason">Active application mechanism found</td>
+            <td class="col-link"><a href="https://careers.rapha.cc/jobs/7304809-creative-project-manager-6-month-ftc" target="_blank" rel="noopener" title="https://careers.rapha.cc/jobs/7304809-creative-project-manager-6-month-ftc">https://careers.rapha.cc/jobs/7304809-creative-project-manager-6-month-ftc</a></td>
+        </tr>
+        <tr class="" data-verdict="UNCERTAIN">
+            <td class="col-role">
+                <span class="job-title">Freelance Creative Strategist</span>
+                <span class="job-company">Almost Studio</span>
+                <span class="job-location">Remote</span>
+            </td>
+            <td class="col-status">
+                <span class="badge" style="background:#65a30d;">Likely Live</span>
+            </td>
+            <td class="col-reason">HTTP 103</td>
+            <td class="col-link"><a href="https://jobs.themincave.com/jobs/freelance-creative-strategist-12b98858" target="_blank" rel="noopener" title="https://jobs.themincave.com/jobs/freelance-creative-strategist-12b98858">https://jobs.themincave.com/jobs/freelance-creative-strategist-12b98858</a></td>
+        </tr>
+        <tr class="row-closed" data-verdict="CLOSED">
+            <td class="col-role">
+                <span class="job-title">Full-Stack Product Engineer</span>
+                <span class="job-company">Senja</span>
+                <span class="job-location">Cape Town / Remote</span>
+            </td>
+            <td class="col-status">
+                <span class="badge" style="background:#dc2626;">Closed</span>
+            </td>
+            <td class="col-reason">Role no longer listed — URL points to a different position</td>
+            <td class="col-link"><a href="https://jobs.senja.io/" target="_blank" rel="noopener" title="https://jobs.senja.io/">https://jobs.senja.io/</a></td>
+        </tr>
+        <tr class="" data-verdict="UNCERTAIN">
+            <td class="col-role">
+                <span class="job-title">Chief of Staff & Operations Lead</span>
+                <span class="job-company">propr</span>
+                <span class="job-location">Remote US</span>
+            </td>
+            <td class="col-status">
+                <span class="badge" style="background:#65a30d;">Likely Live</span>
+            </td>
+            <td class="col-reason">LinkedIn post — cannot verify without auth</td>
+            <td class="col-link"><a href="https://www.linkedin.com/posts/thatbobbyg_chief-of-staff-operations-lead-activity-7434625819295064064-XtdD" target="_blank" rel="noopener" title="https://www.linkedin.com/posts/thatbobbyg_chief-of-staff-operations-lead-activity-7434625819295064064-XtdD">https://www.linkedin.com/posts/thatbobbyg_chief-of-staff-operations-lead-acti...</a></td>
+        </tr>
+        <tr class="" data-verdict="OPEN">
+            <td class="col-role">
+                <span class="job-title">Community Manager</span>
+                <span class="job-company">The Self Hood</span>
+                <span class="job-location">Remote / London</span>
+            </td>
+            <td class="col-status">
+                <span class="badge" style="background:#16a34a;">Live</span>
+            </td>
+            <td class="col-reason">Active application mechanism found</td>
+            <td class="col-link"><a href="https://www.theselfhood.com/part-time-community-manager-job-role-selfhood" target="_blank" rel="noopener" title="https://www.theselfhood.com/part-time-community-manager-job-role-selfhood">https://www.theselfhood.com/part-time-community-manager-job-role-selfhood</a></td>
+        </tr>
+        <tr class="" data-verdict="OPEN">
+            <td class="col-role">
+                <span class="job-title">Facilitator in Residence</span>
+                <span class="job-company">Kolab</span>
+                <span class="job-location">Remote</span>
+            </td>
+            <td class="col-status">
+                <span class="badge" style="background:#16a34a;">Live</span>
+            </td>
+            <td class="col-reason">Page loads with content, no closure signals</td>
+            <td class="col-link"><a href="https://forms.gle/WLfQSLxTxAwys57j7" target="_blank" rel="noopener" title="https://forms.gle/WLfQSLxTxAwys57j7">https://forms.gle/WLfQSLxTxAwys57j7</a></td>
+        </tr>
+        <tr class="region-header">
+            <td colspan="5">
+                Social Impact <span class="region-count">(7)</span><span class="region-closed-badge">2 closed</span>
+            </td>
+        </tr>
+        <tr class="row-closed" data-verdict="CLOSED">
+            <td class="col-role">
+                <span class="job-title">Innovation Associate — Decarbonisation</span>
+                <span class="job-company">Fashion For Good</span>
+                <span class="job-location">India → Amsterdam</span>
+            </td>
+            <td class="col-status">
+                <span class="badge" style="background:#dc2626;">Closed</span>
+            </td>
+            <td class="col-reason">Closed signal found: "applications closed"</td>
+            <td class="col-link"><a href="https://fashion-for-good.homerun.co/innovation-associate-decarbonisation" target="_blank" rel="noopener" title="https://fashion-for-good.homerun.co/innovation-associate-decarbonisation">https://fashion-for-good.homerun.co/innovation-associate-decarbonisation</a></td>
+        </tr>
+        <tr class="" data-verdict="OPEN">
+            <td class="col-role">
+                <span class="job-title">Senior Program Associate</span>
+                <span class="job-company">The Luminos Fund</span>
+                <span class="job-location">Ghana</span>
+            </td>
+            <td class="col-status">
+                <span class="badge" style="background:#16a34a;">Live</span>
+            </td>
+            <td class="col-reason">Active application mechanism found</td>
+            <td class="col-link"><a href="https://the-luminos-fund.breezy.hr/p/677d0c66ae29-program-associate-ghana" target="_blank" rel="noopener" title="https://the-luminos-fund.breezy.hr/p/677d0c66ae29-program-associate-ghana">https://the-luminos-fund.breezy.hr/p/677d0c66ae29-program-associate-ghana</a></td>
+        </tr>
+        <tr class="" data-verdict="OPEN">
+            <td class="col-role">
+                <span class="job-title">Monitoring, Evaluation & Learning Lead</span>
+                <span class="job-company">Trase</span>
+                <span class="job-location">Oxford, UK</span>
+            </td>
+            <td class="col-status">
+                <span class="badge" style="background:#16a34a;">Live</span>
+            </td>
+            <td class="col-reason">Active application mechanism found</td>
+            <td class="col-link"><a href="https://trase.earth/careers/monitoring-evaluation-and-learning-lead-trase" target="_blank" rel="noopener" title="https://trase.earth/careers/monitoring-evaluation-and-learning-lead-trase">https://trase.earth/careers/monitoring-evaluation-and-learning-lead-trase</a></td>
+        </tr>
+        <tr class="" data-verdict="OPEN">
+            <td class="col-role">
+                <span class="job-title">Programme Manager</span>
+                <span class="job-company">unearthodox</span>
+                <span class="job-location">Remote</span>
+            </td>
+            <td class="col-status">
+                <span class="badge" style="background:#16a34a;">Live</span>
+            </td>
+            <td class="col-reason">Active application mechanism found</td>
+            <td class="col-link"><a href="https://unearthodox.org/2026/03/job-openings/" target="_blank" rel="noopener" title="https://unearthodox.org/2026/03/job-openings/">https://unearthodox.org/2026/03/job-openings/</a></td>
+        </tr>
+        <tr class="row-closed" data-verdict="CLOSED">
+            <td class="col-role">
+                <span class="job-title">Communications Manager</span>
+                <span class="job-company">ClimateWorks</span>
+                <span class="job-location">Australia</span>
+            </td>
+            <td class="col-status">
+                <span class="badge" style="background:#dc2626;">Closed</span>
+            </td>
+            <td class="col-reason">Redirected to board with not_found=true</td>
+            <td class="col-link"><a href="https://apply.workable.com/climateworks-foundation-1/j/AA4CF2DD21" target="_blank" rel="noopener" title="https://apply.workable.com/climateworks-foundation-1/j/AA4CF2DD21">https://apply.workable.com/climateworks-foundation-1/j/AA4CF2DD21</a></td>
+        </tr>
+        <tr class="" data-verdict="OPEN">
+            <td class="col-role">
+                <span class="job-title">Senior Impact & Compliance Analyst</span>
+                <span class="job-company">Vivobarefoot</span>
+                <span class="job-location">London, UK</span>
+            </td>
+            <td class="col-status">
+                <span class="badge" style="background:#16a34a;">Live</span>
+            </td>
+            <td class="col-reason">Active application mechanism found</td>
+            <td class="col-link"><a href="https://careers.vivobarefoot.com/jobs/7285185-senior-impact-compliance-analyst" target="_blank" rel="noopener" title="https://careers.vivobarefoot.com/jobs/7285185-senior-impact-compliance-analyst">https://careers.vivobarefoot.com/jobs/7285185-senior-impact-compliance-analyst</a></td>
+        </tr>
+        <tr class="" data-verdict="OPEN">
+            <td class="col-role">
+                <span class="job-title">Growth Associate</span>
+                <span class="job-company">Giving Green</span>
+                <span class="job-location">Remote US</span>
+            </td>
+            <td class="col-status">
+                <span class="badge" style="background:#16a34a;">Live</span>
+            </td>
+            <td class="col-reason">Active application mechanism found</td>
+            <td class="col-link"><a href="https://www.givinggreen.earth/careers" target="_blank" rel="noopener" title="https://www.givinggreen.earth/careers">https://www.givinggreen.earth/careers</a></td>
+        </tr>
+        <tr class="region-header">
+            <td colspan="5">
+                Mildred's Picks <span class="region-count">(4)</span><span class="region-closed-badge">1 closed</span>
+            </td>
+        </tr>
+        <tr class="" data-verdict="OPEN">
+            <td class="col-role">
+                <span class="job-title">Learning Project Manager</span>
+                <span class="job-company">Bow Arts</span>
+                <span class="job-location">London</span>
+            </td>
+            <td class="col-status">
+                <span class="badge" style="background:#16a34a;">Live</span>
+            </td>
+            <td class="col-reason">Active application mechanism found</td>
+            <td class="col-link"><a href="https://bowarts.org/learning-project-manager/" target="_blank" rel="noopener" title="https://bowarts.org/learning-project-manager/">https://bowarts.org/learning-project-manager/</a></td>
+        </tr>
+        <tr class="" data-verdict="OPEN">
+            <td class="col-role">
+                <span class="job-title">Project Officer</span>
+                <span class="job-company">Latin Elephant</span>
+                <span class="job-location">London</span>
+            </td>
+            <td class="col-status">
+                <span class="badge" style="background:#16a34a;">Live</span>
+            </td>
+            <td class="col-reason">Active application mechanism found</td>
+            <td class="col-link"><a href="https://latinelephant.org/vacancies/" target="_blank" rel="noopener" title="https://latinelephant.org/vacancies/">https://latinelephant.org/vacancies/</a></td>
+        </tr>
+        <tr class="row-closed" data-verdict="CLOSED">
+            <td class="col-role">
+                <span class="job-title">Senior Event Operations Manager 2026</span>
+                <span class="job-company">Founders Forum</span>
+                <span class="job-location">London</span>
+            </td>
+            <td class="col-status">
+                <span class="badge" style="background:#dc2626;">Closed</span>
+            </td>
+            <td class="col-reason">Role not found on Workable board</td>
+            <td class="col-link"><a href="https://apply.workable.com/foundersforum/" target="_blank" rel="noopener" title="https://apply.workable.com/foundersforum/">https://apply.workable.com/foundersforum/</a></td>
+        </tr>
+        <tr class="" data-verdict="OPEN">
+            <td class="col-role">
+                <span class="job-title">Communications Officer</span>
+                <span class="job-company">Right to Remain</span>
+                <span class="job-location">Remote UK</span>
+            </td>
+            <td class="col-status">
+                <span class="badge" style="background:#16a34a;">Live</span>
+            </td>
+            <td class="col-reason">Active application mechanism found</td>
+            <td class="col-link"><a href="https://righttoremain.org.uk/job-vacancy-communications-officer/" target="_blank" rel="noopener" title="https://righttoremain.org.uk/job-vacancy-communications-officer/">https://righttoremain.org.uk/job-vacancy-communications-officer/</a></td>
+        </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="footer">
+            Automated scan &middot; HTTP status, redirect analysis, content pattern matching &middot; No manual review
+        </div>
+    </div>
+
+    <script>
+        let currentFilter = 'ALL';
+
+        function filterVerdict(btn, verdict) {
+            currentFilter = verdict;
+            document.querySelectorAll('.pill').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            filterTable();
+        }
+
+        function filterTable() {
+            const search = document.getElementById('searchBox').value.toLowerCase();
+            const rows = document.querySelectorAll('#jobTable tbody tr');
+            let currentRegionVisible = false;
+            let lastRegionRow = null;
+
+            rows.forEach(row => {
+                if (row.classList.contains('region-header')) {
+                    lastRegionRow = row;
+                    currentRegionVisible = false;
+                    row.style.display = 'none';
+                    return;
+                }
+
+                const text = row.textContent.toLowerCase();
+                const verdict = row.getAttribute('data-verdict') || '';
+                const matchSearch = !search || text.includes(search);
+                const matchVerdict = currentFilter === 'ALL' || verdict === currentFilter;
+
+                if (matchSearch && matchVerdict) {
+                    row.style.display = '';
+                    if (lastRegionRow && !currentRegionVisible) {
+                        lastRegionRow.style.display = '';
+                        currentRegionVisible = true;
+                    }
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+            updateRangeTotal();
+            document.getElementById('rangeFrom').value = 1;
+            document.getElementById('rangeTo').value = Math.min(lastIncrement, getVisibleUrls().length);
+        }
+
+        let lastIncrement = 20;
+
+        function getVisibleUrls() {
+            const rows = document.querySelectorAll('#jobTable tbody tr:not(.region-header)');
+            const urls = [];
+            rows.forEach(row => {
+                if (row.style.display === 'none') return;
+                const a = row.querySelector('.col-link a');
+                if (a) urls.push(a.href);
+            });
+            return urls;
+        }
+
+        function updateRangeTotal() {
+            const total = getVisibleUrls().length;
+            document.getElementById('rangeTotal').textContent = total;
+            const toEl = document.getElementById('rangeTo');
+            if (parseInt(toEl.value) > total) toEl.value = total;
+        }
+
+        function openRange() {
+            const urls = getVisibleUrls();
+            if (urls.length === 0) return;
+            const from = Math.max(1, parseInt(document.getElementById('rangeFrom').value) || 1);
+            const to = Math.min(urls.length, parseInt(document.getElementById('rangeTo').value) || from);
+            const batch = urls.slice(from - 1, to);
+            batch.forEach(u => window.open(u, '_blank'));
+            const size = to - from + 1;
+            const nextFrom = to + 1;
+            const nextTo = Math.min(nextFrom + size - 1, urls.length);
+            if (nextFrom <= urls.length) {
+                document.getElementById('rangeFrom').value = nextFrom;
+                document.getElementById('rangeTo').value = nextTo;
+            }
+        }
+
+        function openIncrement(n) {
+            lastIncrement = n;
+            document.querySelectorAll('.pill-sm').forEach(b => b.classList.remove('active'));
+            event.target.classList.add('active');
+            const urls = getVisibleUrls();
+            const from = parseInt(document.getElementById('rangeFrom').value) || 1;
+            const to = Math.min(from + n - 1, urls.length);
+            document.getElementById('rangeTo').value = to;
+            openRange();
+        }
+
+        function exportCSV() {
+            const rows = document.querySelectorAll('#jobTable tbody tr:not(.region-header)');
+            let csv = 'Title,Company,Location,Status,Details,URL\n';
+            rows.forEach(row => {
+                const title = row.querySelector('.job-title')?.textContent?.trim() || '';
+                const company = row.querySelector('.job-company')?.textContent?.trim() || '';
+                const location = row.querySelector('.job-location')?.textContent?.trim() || '';
+                const status = row.querySelector('.badge')?.textContent?.trim() || '';
+                const reason = row.querySelector('.col-reason')?.textContent?.trim() || '';
+                const link = row.querySelector('.col-link a')?.getAttribute('href') || '';
+                const esc = s => '"' + s.replace(/"/g, '""') + '"';
+                csv += [esc(title), esc(company), esc(location), esc(status), esc(reason), esc(link)].join(',') + '\n';
+            });
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'freshness-audit-2026-03-24.csv';
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        updateRangeTotal();
+
+    </script>
+</body>
+</html>
