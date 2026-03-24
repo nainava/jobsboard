@@ -3,8 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Freshness Audit: Generalist World</title>
-    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%94%8D%3C/text%3E%3C/svg%3E">
+    <title>Freshness Audit — generalist.world — 2026-03-24</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     <style>
@@ -67,31 +66,27 @@
         .open-range {
             display: inline-flex;
             align-items: center;
-            gap: 4px;
+            gap: 6px;
             flex-wrap: nowrap;
-            transform: scale(0.85);
-            transform-origin: right center;
-            opacity: 0.7;
         }
-        .open-range:hover { opacity: 1; }
-        .open-range-label { font-size: 11px; color: #94a3b8; white-space: nowrap; }
-        .open-range-hint { font-size: 9px; color: #b0b8c4; white-space: nowrap; }
+        .open-range-label { font-size: 12px; color: #64748b; white-space: nowrap; }
+        .open-range-hint { font-size: 10px; color: #94a3b8; white-space: nowrap; }
         .range-input {
-            width: 40px;
-            padding: 3px 4px;
+            width: 48px;
+            padding: 4px 6px;
             border-radius: 4px;
             border: 1px solid #e2e8f0;
-            font-size: 11px;
+            font-size: 12px;
             font-family: inherit;
             text-align: center;
-            color: #64748b;
+            color: #334155;
         }
         .range-input:focus { outline: none; border-color: #94a3b8; }
         .btn-go {
-            padding: 3px 8px !important;
-            font-size: 10px !important;
+            padding: 5px 10px !important;
+            font-size: 11px !important;
         }
-        .increment-btns { display: inline-flex; gap: 2px; margin-left: 2px; }
+        .increment-btns { display: inline-flex; gap: 3px; margin-left: 4px; }
         .pill-sm {
             padding: 3px 8px;
             border-radius: 4px;
@@ -189,13 +184,10 @@
             font-weight: 500;
             font-family: inherit;
             color: #64748b;
-            -webkit-appearance: none;
-            appearance: none;
-            outline: none;
+            transition: all 0.12s;
         }
-        .pill:hover, .pill:focus, .pill:focus-visible, .pill:active { background: white !important; border-color: #e2e8f0 !important; color: #64748b !important; outline: none !important; box-shadow: none !important; }
-        .pill.active { background: #0f172a !important; color: white !important; border-color: #0f172a !important; }
-        .pill.active:hover, .pill.active:focus, .pill.active:focus-visible, .pill.active:active { background: #0f172a !important; color: white !important; border-color: #0f172a !important; }
+        .pill:hover { background: #f8fafc; }
+        .pill.active { background: #0f172a; color: white; border-color: #0f172a; }
         .pill .ct { opacity: 0.5; margin-left: 3px; }
 
         /* ── Table ── */
@@ -249,12 +241,12 @@
             letter-spacing: 0;
         }
         .region-closed-badge { background: #fef2f2; color: #dc2626; }
-        .region-update-badge { background: #fef9e7; color: #b8860b; }
+        .region-update-badge { background: #fff7ed; color: #ea580c; }
 
-        tr.row-closed { opacity: 0.85; }
-        tr.row-closed:hover { opacity: 0.85; }
-        ::selection { background: #fde68a; color: #1e293b; }
-        ::-moz-selection { background: #fde68a; color: #1e293b; }
+        tr.row-closed { opacity: 0.55; }
+        tr.row-closed:hover { opacity: 0.8; }
+        tr.row-update { background: #fffbf5; }
+        tr.row-update:hover { background: #fff7ed; }
 
         .col-role { min-width: 220px; }
         .job-title { font-weight: 500; color: #0f172a; display: block; }
@@ -309,7 +301,7 @@
             <div class="topbar-left">
                 <h1>Listing Freshness Audit</h1>
                 <div class="meta">
-                    <a href="https://generalist.world/jobs/">generalist.world</a> &middot; 104 listings &middot; Last scanned March 24, 2026 at 14:55
+                    <a href="https://generalist.world/jobs/">generalist.world</a> &middot; 104 listings &middot; Last scanned March 24, 2026 at 14:25
                 </div>
             </div>
             <div class="topbar-right">
@@ -322,7 +314,7 @@
 
         <div class="summary-strip">
             <svg viewBox="0 0 100 100" class="donut">
-        <path d="M 50.0,6.0 A 44,44 0 1 1 13.788709900679123,74.99484885617085 L 25.31048402319031,67.04194240193468 A 30,30 0 1 0 50.0,20.0 Z" fill="#16a34a" /><path d="M 13.788709900679123,74.99484885617085 A 44,44 0 0 1 8.859285321841746,34.397384970128435 L 21.949512719437553,39.36185338872393 A 30,30 0 0 0 25.31048402319031,67.04194240193468 Z" fill="#65a30d" /><path d="M 8.859285321841746,34.397384970128435 A 44,44 0 0 1 13.788709900679123,25.005151143829135 L 25.310484023190313,32.958057598065324 A 30,30 0 0 0 21.949512719437553,39.36185338872393 Z" fill="#b8860b" /><path d="M 13.788709900679123,25.005151143829135 A 44,44 0 0 1 49.99999999999999,6.0 L 49.99999999999999,20.0 A 30,30 0 0 0 25.310484023190313,32.958057598065324 Z" fill="#dc2626" />
+        <path d="M 50.0,6.0 A 44,44 0 1 1 13.788709900679123,74.99484885617085 L 25.31048402319031,67.04194240193468 A 30,30 0 1 0 50.0,20.0 Z" fill="#16a34a" /><path d="M 13.788709900679123,74.99484885617085 A 44,44 0 0 1 8.859285321841746,34.397384970128435 L 21.949512719437553,39.36185338872393 A 30,30 0 0 0 25.31048402319031,67.04194240193468 Z" fill="#65a30d" /><path d="M 8.859285321841746,34.397384970128435 A 44,44 0 0 1 13.788709900679123,25.005151143829135 L 25.310484023190313,32.958057598065324 A 30,30 0 0 0 21.949512719437553,39.36185338872393 Z" fill="#ea580c" /><path d="M 13.788709900679123,25.005151143829135 A 44,44 0 0 1 49.99999999999999,6.0 L 49.99999999999999,20.0 A 30,30 0 0 0 25.310484023190313,32.958057598065324 Z" fill="#dc2626" />
         <text x="50" y="47" text-anchor="middle" class="donut-pct">81%</text>
         <text x="50" y="57" text-anchor="middle" class="donut-label">healthy</text>
     </svg>
@@ -336,7 +328,7 @@
                     <div class="metric-label">Closed</div>
                 </div>
                 <div class="metric">
-                    <div class="metric-value" style="color:#b8860b;">4</div>
+                    <div class="metric-value" style="color:#ea580c;">4</div>
                     <div class="metric-label">Needs Update</div>
                 </div>
                 <div class="metric">
@@ -350,13 +342,13 @@
                     <div class="health-bar-seg" style="width:65.4%;background:#16a34a;"></div>
                     <div class="health-bar-seg" style="width:15.4%;background:#65a30d;"></div>
                     <div class="health-bar-seg" style="width:0.0%;background:#d1d5db;"></div>
-                    <div class="health-bar-seg" style="width:3.8%;background:#b8860b;"></div>
+                    <div class="health-bar-seg" style="width:3.8%;background:#ea580c;"></div>
                     <div class="health-bar-seg" style="width:15.4%;background:#dc2626;"></div>
                 </div>
                 <div class="legend">
                     <div class="legend-item"><span class="legend-dot" style="background:#16a34a;"></span>Live</div>
                     <div class="legend-item"><span class="legend-dot" style="background:#65a30d;"></span>Likely Live</div>
-                    <div class="legend-item"><span class="legend-dot" style="background:#b8860b;"></span>Needs Update</div>
+                    <div class="legend-item"><span class="legend-dot" style="background:#ea580c;"></span>Needs Update</div>
                     <div class="legend-item"><span class="legend-dot" style="background:#dc2626;"></span>Closed</div>
                 </div>
             </div>
@@ -365,12 +357,12 @@
         <div class="toolbar">
             <input type="text" class="search-box" placeholder="Filter..." oninput="filterTable()" id="searchBox">
             <div class="sep"></div>
-            <span class="pill active" onclick="filterVerdict(this, 'ALL')">All <span class="ct">104</span></span>
-            <span class="pill" onclick="filterVerdict(this, 'CLOSED')">Closed <span class="ct">16</span></span>
-            <span class="pill" onclick="filterVerdict(this, 'NEEDS_UPDATE')">Needs Update <span class="ct">4</span></span>
-            <span class="pill" onclick="filterVerdict(this, 'UNCERTAIN')">Likely Live <span class="ct">16</span></span>
-            <span class="pill" onclick="filterVerdict(this, 'OPEN')">Live <span class="ct">68</span></span>
-            <span class="pill" onclick="filterVerdict(this, 'UNREACHABLE')">Unreachable <span class="ct">0</span></span>
+            <button class="pill active" onclick="filterVerdict(this, 'ALL')">All <span class="ct">104</span></button>
+            <button class="pill" onclick="filterVerdict(this, 'OPEN')">Live <span class="ct">68</span></button>
+            <button class="pill" onclick="filterVerdict(this, 'UNCERTAIN')">Likely Live <span class="ct">16</span></button>
+            <button class="pill" onclick="filterVerdict(this, 'NEEDS_UPDATE')">Needs Update <span class="ct">4</span></button>
+            <button class="pill" onclick="filterVerdict(this, 'CLOSED')">Closed <span class="ct">16</span></button>
+            <button class="pill" onclick="filterVerdict(this, 'UNREACHABLE')">Unreachable <span class="ct">0</span></button>
             <div class="toolbar-spacer"></div>
             <div class="open-range">
                 <span class="open-range-label">Open</span>
@@ -481,14 +473,14 @@
             <td class="col-reason">Active application mechanism found</td>
             <td class="col-link"><a href="https://themarketingmeetupjobs.com/job/2197523-commercial-director" target="_blank" rel="noopener" title="https://themarketingmeetupjobs.com/job/2197523-commercial-director">https://themarketingmeetupjobs.com/job/2197523-commercial-director</a></td>
         </tr>
-        <tr class="" data-verdict="NEEDS_UPDATE">
+        <tr class="row-update" data-verdict="NEEDS_UPDATE">
             <td class="col-role">
                 <span class="job-title">Director of Operations / COO</span>
                 <span class="job-company">Centre for Effective Altruism</span>
                 <span class="job-location">Remote / Oxford / SF</span>
             </td>
             <td class="col-status">
-                <span class="badge" style="background:#b8860b;">Needs Update</span>
+                <span class="badge" style="background:#ea580c;">Needs Update</span>
             </td>
             <td class="col-reason">URL redirects to generic careers page — needs new link</td>
             <td class="col-link"><a href="https://www.centreforeffectivealtruism.org/careers/head-of-operations" target="_blank" rel="noopener" title="https://www.centreforeffectivealtruism.org/careers/head-of-operations">https://www.centreforeffectivealtruism.org/careers/head-of-operations</a></td>
@@ -774,14 +766,14 @@
             <td class="col-reason">Page content too minimal — may require JS rendering</td>
             <td class="col-link"><a href="https://www.notbadforagirldj.com/news/articles/operations-and-delivery-coordinator" target="_blank" rel="noopener" title="https://www.notbadforagirldj.com/news/articles/operations-and-delivery-coordinator">https://www.notbadforagirldj.com/news/articles/operations-and-delivery-coordi...</a></td>
         </tr>
-        <tr class="" data-verdict="NEEDS_UPDATE">
+        <tr class="row-update" data-verdict="NEEDS_UPDATE">
             <td class="col-role">
                 <span class="job-title">National Network Manager</span>
                 <span class="job-company">The Leap</span>
                 <span class="job-location">Bradford / Remote UK</span>
             </td>
             <td class="col-status">
-                <span class="badge" style="background:#b8860b;">Needs Update</span>
+                <span class="badge" style="background:#ea580c;">Needs Update</span>
             </td>
             <td class="col-reason">URL points to homepage — needs direct job link</td>
             <td class="col-link"><a href="https://www.the-leap.org.uk/" target="_blank" rel="noopener" title="https://www.the-leap.org.uk/">https://www.the-leap.org.uk/</a></td>
@@ -1067,14 +1059,14 @@
             <td class="col-reason">Active application mechanism found</td>
             <td class="col-link"><a href="https://ats.rippling.com/community-phone-careers/jobs/b0b1ec9b-6161-483b-99ac-c4c7bc1bd248" target="_blank" rel="noopener" title="https://ats.rippling.com/community-phone-careers/jobs/b0b1ec9b-6161-483b-99ac-c4c7bc1bd248">https://ats.rippling.com/community-phone-careers/jobs/b0b1ec9b-6161-483b-99ac...</a></td>
         </tr>
-        <tr class="" data-verdict="NEEDS_UPDATE">
+        <tr class="row-update" data-verdict="NEEDS_UPDATE">
             <td class="col-role">
                 <span class="job-title">Director of Product Marketing</span>
                 <span class="job-company">ComPsych</span>
                 <span class="job-location">Remote US</span>
             </td>
             <td class="col-status">
-                <span class="badge" style="background:#b8860b;">Needs Update</span>
+                <span class="badge" style="background:#ea580c;">Needs Update</span>
             </td>
             <td class="col-reason">URL points to generic careers page — needs direct job link</td>
             <td class="col-link"><a href="https://www.compsych.com/careers/" target="_blank" rel="noopener" title="https://www.compsych.com/careers/">https://www.compsych.com/careers/</a></td>
@@ -1276,14 +1268,14 @@
                 Europe <span class="region-count">(10)</span><span class="region-closed-badge">1 closed</span><span class="region-update-badge">1 needs update</span>
             </td>
         </tr>
-        <tr class="" data-verdict="NEEDS_UPDATE">
+        <tr class="row-update" data-verdict="NEEDS_UPDATE">
             <td class="col-role">
                 <span class="job-title">Chief of Staff</span>
                 <span class="job-company">BeAngels</span>
                 <span class="job-location">Belgium</span>
             </td>
             <td class="col-status">
-                <span class="badge" style="background:#b8860b;">Needs Update</span>
+                <span class="badge" style="background:#ea580c;">Needs Update</span>
             </td>
             <td class="col-reason">URL points to homepage — better link available on LinkedIn</td>
             <td class="col-link"><a href="https://www.beangels.eu/en" target="_blank" rel="noopener" title="https://www.beangels.eu/en">https://www.beangels.eu/en</a></td>
@@ -1815,7 +1807,6 @@
         }
 
         updateRangeTotal();
-
     </script>
 </body>
 </html>
