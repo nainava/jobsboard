@@ -954,6 +954,44 @@ def generate_html(results, output_path="report.html", source_name="generalist.wo
             letter-spacing: 0.2px;
         }}
 
+        /* ── Pagination ── */
+        .pagination {{
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 14px 16px;
+            border-top: 1px solid #f1f5f9;
+            flex-wrap: wrap;
+            gap: 8px;
+        }}
+        .page-info {{
+            font-size: 12px;
+            color: #94a3b8;
+        }}
+        .page-buttons {{
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }}
+        .page-btn {{
+            padding: 5px 10px;
+            border-radius: 6px;
+            border: 1px solid #e2e8f0;
+            background: white;
+            font-size: 12px;
+            font-family: inherit;
+            color: #475569;
+            cursor: pointer;
+            transition: all 0.12s;
+            -webkit-appearance: none;
+            appearance: none;
+            outline: none;
+        }}
+        .page-btn:hover {{ background: #f8fafc; border-color: #cbd5e1; }}
+        .page-btn.active {{ background: #0f172a; color: white; border-color: #0f172a; }}
+        .page-btn.disabled {{ opacity: 0.4; cursor: default; pointer-events: none; }}
+        .page-ellipsis {{ color: #94a3b8; font-size: 12px; padding: 0 4px; }}
+
         /* ── Footer ── */
         .footer {{
             padding: 20px 0;
@@ -965,11 +1003,29 @@ def generate_html(results, output_path="report.html", source_name="generalist.wo
         }}
 
         @media (max-width: 900px) {{
-            .container {{ padding: 20px 16px 32px; }}
+            .container {{ padding: 20px 12px 32px; }}
             .summary-strip {{ flex-direction: column; gap: 16px; }}
             .summary-metrics {{ flex-wrap: wrap; }}
             .search-box {{ width: 100%; }}
             .topbar {{ flex-direction: column; gap: 8px; }}
+            .topbar-right {{ width: 100%; }}
+            .topbar-right .btn {{ width: 100%; text-align: center; }}
+            .summary-canvas {{ width: 100px; height: 100px; }}
+            .pills {{ flex-wrap: wrap; }}
+            .open-range {{ flex-wrap: wrap; }}
+            /* Table: hide reason + URL columns, make it fit */
+            .col-reason {{ display: none; }}
+            .col-link {{ display: none; }}
+            th:nth-child(4), td:nth-child(4) {{ display: none; }}
+            th:nth-child(5), td:nth-child(5) {{ display: none; }}
+            table {{ font-size: 12px; }}
+            td, th {{ padding: 8px 6px; }}
+            .job-title {{ font-size: 13px; }}
+            .col-status {{ width: auto; }}
+            .badge {{ font-size: 10px; padding: 2px 6px; }}
+            /* Pagination */
+            .pagination {{ flex-direction: column; align-items: flex-start; gap: 8px; }}
+            .page-buttons {{ flex-wrap: wrap; }}
         }}
     </style>
 </head>
@@ -994,19 +1050,19 @@ def generate_html(results, output_path="report.html", source_name="generalist.wo
             {donut_svg}
             <div class="summary-metrics">
                 <div class="metric">
-                    <div class="metric-value" style="color:#16a34a;">{healthy_count}</div>
+                    <div class="metric-value" style="color:#16a34a;">{healthy_count:,}</div>
                     <div class="metric-label">Verified Active</div>
                 </div>
                 <div class="metric">
-                    <div class="metric-value" style="color:#dc2626;">{closed_count}</div>
+                    <div class="metric-value" style="color:#dc2626;">{closed_count:,}</div>
                     <div class="metric-label">Closed</div>
                 </div>
                 <div class="metric">
-                    <div class="metric-value" style="color:#b8860b;">{needs_update_count}</div>
+                    <div class="metric-value" style="color:#b8860b;">{needs_update_count:,}</div>
                     <div class="metric-label">Needs Update</div>
                 </div>
                 <div class="metric">
-                    <div class="metric-value">{total}</div>
+                    <div class="metric-value">{total:,}</div>
                     <div class="metric-label">Total Checked</div>
                 </div>
             </div>
@@ -1029,14 +1085,14 @@ def generate_html(results, output_path="report.html", source_name="generalist.wo
         </div>
 
         <div class="toolbar">
-            <input type="text" class="search-box" placeholder="Filter..." oninput="filterTable()" id="searchBox">
+            <input type="text" class="search-box" placeholder="Filter..." id="searchBox">
             <div class="sep"></div>
-            <span class="pill active" onclick="filterVerdict(this, 'ALL')">All <span class="ct">{total}</span></span>
-            <span class="pill" onclick="filterVerdict(this, 'CLOSED')">Closed <span class="ct">{closed_count}</span></span>
-            <span class="pill" onclick="filterVerdict(this, 'NEEDS_UPDATE')">Needs Update <span class="ct">{needs_update_count}</span></span>
-            <span class="pill" onclick="filterVerdict(this, 'UNCERTAIN')">Likely Live <span class="ct">{uncertain_count}</span></span>
-            <span class="pill" onclick="filterVerdict(this, 'OPEN')">Live <span class="ct">{open_count}</span></span>
-            <span class="pill" onclick="filterVerdict(this, 'UNREACHABLE')">Unreachable <span class="ct">{unreachable_count}</span></span>
+            <span class="pill active" onclick="filterVerdict(this, 'ALL')">All <span class="ct">{total:,}</span></span>
+            <span class="pill" onclick="filterVerdict(this, 'CLOSED')">Closed <span class="ct">{closed_count:,}</span></span>
+            <span class="pill" onclick="filterVerdict(this, 'NEEDS_UPDATE')">Needs Update <span class="ct">{needs_update_count:,}</span></span>
+            <span class="pill" onclick="filterVerdict(this, 'UNCERTAIN')">Likely Live <span class="ct">{uncertain_count:,}</span></span>
+            <span class="pill" onclick="filterVerdict(this, 'OPEN')">Live <span class="ct">{open_count:,}</span></span>
+            <span class="pill" onclick="filterVerdict(this, 'UNREACHABLE')">Unreachable <span class="ct">{unreachable_count:,}</span></span>
             <div class="toolbar-spacer"></div>
             <div class="open-range">
                 <span class="open-range-label">Open</span>
@@ -1074,53 +1130,113 @@ def generate_html(results, output_path="report.html", source_name="generalist.wo
             </table>
         </div>
 
+        <div class="pagination" id="pagination"></div>
+
         <div class="footer">
             Automated scan &middot; HTTP status, redirect analysis, content pattern matching &middot; No manual review
         </div>
     </div>
 
     <script>
+        const PAGE_SIZE = 50;
         let currentFilter = 'ALL';
+        let currentPage = 1;
+        let filteredRows = [];
 
         function filterVerdict(btn, verdict) {{
             currentFilter = verdict;
             document.querySelectorAll('.pill').forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
+            currentPage = 1;
             filterTable();
         }}
 
-        function filterTable() {{
+        function getFilteredDataRows() {{
+            // Returns only data rows (no region headers) that match filters
             const search = document.getElementById('searchBox').value.toLowerCase();
-            const rows = document.querySelectorAll('#jobTable tbody tr');
-            let currentRegionVisible = false;
-            let lastRegionRow = null;
-
-            rows.forEach(row => {{
-                if (row.classList.contains('region-header')) {{
-                    lastRegionRow = row;
-                    currentRegionVisible = false;
-                    row.style.display = 'none';
-                    return;
-                }}
-
+            const allRows = Array.from(document.querySelectorAll('#jobTable tbody tr:not(.region-header)'));
+            return allRows.filter(row => {{
                 const text = row.textContent.toLowerCase();
                 const verdict = row.getAttribute('data-verdict') || '';
                 const matchSearch = !search || text.includes(search);
                 const matchVerdict = currentFilter === 'ALL' || verdict === currentFilter;
+                return matchSearch && matchVerdict;
+            }});
+        }}
 
-                if (matchSearch && matchVerdict) {{
-                    row.style.display = '';
-                    if (lastRegionRow && !currentRegionVisible) {{
-                        lastRegionRow.style.display = '';
-                        currentRegionVisible = true;
-                    }}
-                }} else {{
-                    row.style.display = 'none';
+        // Map each data row to its region header
+        function getRegionForRow(row) {{
+            let prev = row.previousElementSibling;
+            while (prev) {{
+                if (prev.classList.contains('region-header')) return prev;
+                prev = prev.previousElementSibling;
+            }}
+            return null;
+        }}
+
+        function filterTable() {{
+            // Hide all rows first
+            document.querySelectorAll('#jobTable tbody tr').forEach(r => r.style.display = 'none');
+
+            filteredRows = getFilteredDataRows();
+            const totalPages = Math.max(1, Math.ceil(filteredRows.length / PAGE_SIZE));
+            if (currentPage > totalPages) currentPage = totalPages;
+
+            const start = (currentPage - 1) * PAGE_SIZE;
+            const end = Math.min(start + PAGE_SIZE, filteredRows.length);
+            const pageRows = filteredRows.slice(start, end);
+
+            // Show data rows for this page + their region headers
+            const shownRegions = new Set();
+            pageRows.forEach(row => {{
+                row.style.display = '';
+                const region = getRegionForRow(row);
+                if (region && !shownRegions.has(region)) {{
+                    region.style.display = '';
+                    shownRegions.add(region);
                 }}
             }});
+
+            renderPagination(totalPages);
             updateRangeTotal();
             document.getElementById('rangeFrom').value = 1;
             document.getElementById('rangeTo').value = Math.min(lastIncrement, getVisibleUrls().length);
+        }}
+
+        function renderPagination(totalPages) {{
+            const el = document.getElementById('pagination');
+            if (totalPages <= 1) {{ el.innerHTML = ''; return; }}
+
+            const info = `<span class="page-info">Page ${{currentPage}} of ${{totalPages}} &middot; ${{filteredRows.length}} listings</span>`;
+
+            let buttons = '';
+            buttons += `<button class="page-btn ${{currentPage === 1 ? 'disabled' : ''}}" onclick="goPage(${{currentPage - 1}})" ${{currentPage === 1 ? 'disabled' : ''}}>&lsaquo; Prev</button>`;
+
+            // Show page numbers with ellipsis
+            const pages = [];
+            pages.push(1);
+            for (let p = Math.max(2, currentPage - 2); p <= Math.min(totalPages - 1, currentPage + 2); p++) pages.push(p);
+            if (totalPages > 1) pages.push(totalPages);
+            const unique = [...new Set(pages)].sort((a,b) => a - b);
+
+            let last = 0;
+            unique.forEach(p => {{
+                if (p - last > 1) buttons += `<span class="page-ellipsis">&hellip;</span>`;
+                buttons += `<button class="page-btn ${{p === currentPage ? 'active' : ''}}" onclick="goPage(${{p}})">${{p}}</button>`;
+                last = p;
+            }});
+
+            buttons += `<button class="page-btn ${{currentPage === totalPages ? 'disabled' : ''}}" onclick="goPage(${{currentPage + 1}})" ${{currentPage === totalPages ? 'disabled' : ''}}>Next &rsaquo;</button>`;
+
+            el.innerHTML = info + `<div class="page-buttons">${{buttons}}</div>`;
+        }}
+
+        function goPage(p) {{
+            const totalPages = Math.max(1, Math.ceil(filteredRows.length / PAGE_SIZE));
+            if (p < 1 || p > totalPages) return;
+            currentPage = p;
+            filterTable();
+            document.querySelector('.table-wrap').scrollIntoView({{ behavior: 'smooth', block: 'start' }});
         }}
 
         let lastIncrement = 20;
@@ -1192,7 +1308,15 @@ def generate_html(results, output_path="report.html", source_name="generalist.wo
             URL.revokeObjectURL(url);
         }}
 
-        updateRangeTotal();
+        // Debounce search
+        let searchTimeout;
+        document.getElementById('searchBox').addEventListener('input', function() {{
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(() => {{ currentPage = 1; filterTable(); }}, 200);
+        }});
+
+        // Initial render
+        filterTable();
 
     </script>
 </body>

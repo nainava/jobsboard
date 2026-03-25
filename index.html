@@ -295,11 +295,24 @@
         }
 
         @media (max-width: 900px) {
-            .container { padding: 20px 16px 32px; }
+            .container { padding: 20px 12px 32px; }
             .summary-strip { flex-direction: column; gap: 16px; }
             .summary-metrics { flex-wrap: wrap; }
             .search-box { width: 100%; }
             .topbar { flex-direction: column; gap: 8px; }
+            .topbar-right { width: 100%; }
+            .topbar-right .btn { width: 100%; text-align: center; }
+            .open-range { flex-wrap: wrap; }
+            /* Table: hide reason + URL columns on mobile */
+            .col-reason { display: none; }
+            .col-link { display: none; }
+            th:nth-child(3), td:nth-child(3) { display: none; }
+            th:nth-child(4), td:nth-child(4) { display: none; }
+            table { font-size: 12px; }
+            td, th { padding: 8px 6px; }
+            .job-title { font-size: 13px; }
+            .col-status { width: auto; }
+            .badge { font-size: 10px; padding: 2px 6px; }
         }
     </style>
 </head>
