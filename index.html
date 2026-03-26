@@ -294,6 +294,33 @@
             color: #cbd5e1;
         }
 
+        /* ── Site nav ── */
+        .site-nav {
+            display: flex;
+            align-items: center;
+            gap: 24px;
+            padding: 12px 40px;
+            border-bottom: 1px solid #f1f5f9;
+            font-size: 13px;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+        .site-nav .nav-brand {
+            font-weight: 600;
+            color: #0f172a;
+            text-decoration: none;
+            letter-spacing: -0.2px;
+        }
+        .site-nav a {
+            color: #64748b;
+            text-decoration: none;
+            font-weight: 500;
+            padding: 4px 0;
+            border-bottom: 2px solid transparent;
+            transition: all 0.12s;
+        }
+        .site-nav a:hover { color: #0f172a; }
+        .site-nav a.active { color: #0f172a; border-bottom-color: #0f172a; }
+
         @media (max-width: 900px) {
             .container { padding: 20px 12px 32px; }
             .summary-strip { flex-direction: column; gap: 16px; }
@@ -317,6 +344,11 @@
     </style>
 </head>
 <body>
+    <nav class="site-nav">
+        <a href="/" class="nav-brand">Generalist World</a>
+        <a href="/" class="active">Listings Audit</a>
+        <a href="/insights">Hiring Pulse</a>
+    </nav>
     <div class="container">
         <div class="topbar">
             <div class="topbar-left">

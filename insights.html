@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hiring Pulse: Generalist World</title>
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%93%8A%3C/text%3E%3C/svg%3E">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', -apple-system, sans-serif; background: #faf8f5; color: #3b3024; line-height: 1.5; -webkit-font-smoothing: antialiased; font-size: 13px; }
+        ::selection { background: #fde68a; }
+        .container { max-width: 920px; margin: 0 auto; padding: 32px 32px 40px; }
+
+        .header { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 24px; padding-bottom: 16px; border-bottom: 1px solid #e8e0d4; }
+        .header h1 { font-size: 15px; font-weight: 600; color: #2c2218; }
+        .header .meta { font-size: 11px; color: #a0927f; }
+        .header .meta a { color: #7a6c5b; text-decoration: none; }
+
+        /* Stats */
+        .stats { display: flex; gap: 32px; margin-bottom: 20px; }
+        .stat-val { font-size: 18px; font-weight: 700; line-height: 1; }
+        .stat-lbl { font-size: 10px; color: #a0927f; margin-top: 2px; text-transform: uppercase; letter-spacing: 0.3px; }
+
+        /* Callout */
+        .callout { padding: 10px 14px; background: #f5f0e8; border-left: 3px solid #c4956a; margin-bottom: 24px; font-size: 12px; color: #5c4a36; line-height: 1.5; }
+
+        /* Two column */
+        .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 24px; }
+
+        /* Section labels */
+        .sec-label { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: #a0927f; margin-bottom: 8px; }
+
+        /* Insights */
+        .insights { list-style: none; }
+        .insights li { padding: 7px 0; border-bottom: 1px solid #ece5da; font-size: 12px; color: #5c4a36; line-height: 1.45; }
+        .insights li:last-child { border-bottom: none; }
+        .insights li strong { color: #2c2218; display: block; margin-bottom: 1px; }
+        .tag { display: inline-block; padding: 1px 5px; border-radius: 3px; font-size: 9px; font-weight: 500; margin-right: 2px; margin-top: 3px; }
+        .tag-r { background: #e6f0ec; color: #2d6a4f; }
+        .tag-t { background: #f0eae2; color: #7c5e3c; }
+        .tag-s { background: #fef3dc; color: #a16207; }
+
+        /* Weekly note */
+        .weekly-note { font-size: 11px; color: #7a6c5b; line-height: 1.6; margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid #e8e0d4; }
+
+        /* Expandable */
+        .closed-details { margin-bottom: 20px; }
+        .closed-details summary { cursor: pointer; font-size: 11px; font-weight: 500; color: #7a6c5b; padding: 6px 0; list-style: none; user-select: none; }
+        .closed-details summary::-webkit-details-marker { display: none; }
+        .closed-details summary::before { content: "\25B6\00a0"; font-size: 8px; }
+        .closed-details[open] summary::before { content: "\25BC\00a0"; }
+        .closed-details summary:hover { color: #2c2218; }
+        .table-wrap { border: 1px solid #e8e0d4; border-radius: 10px; overflow: hidden; margin-top: 8px; }
+        .table-wrap table { width: 100%; border-collapse: collapse; font-size: 13px; }
+        .table-wrap thead th { background: #f5f0e8; padding: 8px 16px; text-align: left; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.4px; color: #a0927f; border-bottom: 1px solid #e2e8f0; }
+        .table-wrap tbody td { padding: 10px 16px; border-bottom: 1px solid #ece5da; vertical-align: top; }
+        .table-wrap tbody tr:last-child td { border-bottom: none; }
+        .table-wrap tbody tr:hover { background: #f9f5ef; }
+        .table-wrap tr.row-closed { opacity: 0.85; }
+        .col-role { min-width: 200px; }
+        .job-title { font-weight: 500; color: #2c2218; display: block; }
+        .job-company { font-size: 12px; color: #7a6c5b; display: block; }
+        .job-location { font-size: 11px; color: #a0927f; display: block; }
+        .col-status { white-space: nowrap; width: 90px; }
+        .col-reason { font-size: 12px; color: #a0927f; max-width: 240px; }
+        .col-link { font-family: 'JetBrains Mono', monospace; font-size: 11px; word-break: break-all; max-width: 360px; line-height: 1.4; }
+        .col-link a { color: #5c4a36; text-decoration: none; }
+        .col-link a:hover { color: #2c2218; text-decoration: underline; }
+        .badge { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 600; color: white; letter-spacing: 0.2px; }
+
+        .footer { text-align: center; font-size: 10px; color: #c4b8a8; padding-top: 12px; border-top: 1px solid #ece5da; }
+
+        /* ── Site nav ── */
+        .site-nav {
+            display: flex;
+            align-items: center;
+            gap: 24px;
+            padding: 12px 32px;
+            border-bottom: 1px solid #f1f5f9;
+            font-size: 13px;
+        }
+        .site-nav .nav-brand {
+            font-weight: 600;
+            color: #0f172a;
+            text-decoration: none;
+            letter-spacing: -0.2px;
+        }
+        .site-nav a {
+            color: #64748b;
+            text-decoration: none;
+            font-weight: 500;
+            padding: 4px 0;
+            border-bottom: 2px solid transparent;
+            transition: all 0.12s;
+        }
+        .site-nav a:hover { color: #0f172a; }
+        .site-nav a.active { color: #0f172a; border-bottom-color: #0f172a; }
+
+        @media (max-width: 700px) {
+            .container { padding: 20px 16px 32px; }
+            .two-col { grid-template-columns: 1fr; }
+            .stats { flex-wrap: wrap; gap: 20px; }
+            .col-reason { display: none; }
+            .col-link { display: none; }
+            .table-wrap table { font-size: 12px; }
+            .table-wrap td, .table-wrap th { padding: 8px 6px; }
+            .site-nav { padding: 12px 16px; gap: 16px; }
+        }
+    </style>
+</head>
+<body>
+    <nav class="site-nav">
+        <a href="/" class="nav-brand">Generalist World</a>
+        <a href="/">Listings Audit</a>
+        <a href="/insights" class="active">Hiring Pulse</a>
+    </nav>
+<div class="container">
+    <div class="header">
+        <div>
+            <h1>Hiring Pulse</h1>
+            <div class="meta"><a href="https://generalist.world/jobs/">generalist.world</a> &middot; Week of March 24, 2026</div>
+        </div>
+        <div class="meta">104 listings tracked</div>
+    </div>
+
+    <div class="stats">
+        <div><div class="stat-val" style="color:#16a34a">88</div><div class="stat-lbl">Active</div></div>
+        <div><div class="stat-val" style="color:#dc2626">16</div><div class="stat-lbl">Closed</div></div>
+        <div><div class="stat-val">15%</div><div class="stat-lbl">Closure Rate</div></div>
+        <div><div class="stat-val">104</div><div class="stat-lbl">Total</div></div>
+    </div>
+
+    <div class="callout">Ops/CoS/Strategy roles are closing fastest — 6 of 16 closures. UK had the highest regional closure rate (5 of 28 = 18%), suggesting strong local hiring velocity.</div>
+
+    <div class="two-col">
+        <div>
+            <div class="sec-label">Closures by Role Type</div>
+            <!-- y-axis 0,2,4,6,8. unit=10px per 1, baseline y=88 -->
+            <svg viewBox="0 0 280 105" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;display:block">
+                <!-- gridlines at 0,2,4,6,8 -->
+                <line x1="20" y1="8"  x2="275" y2="8"  stroke="#ece5da" stroke-width="0.5"/>
+                <line x1="20" y1="28" x2="275" y2="28" stroke="#ece5da" stroke-width="0.5"/>
+                <line x1="20" y1="48" x2="275" y2="48" stroke="#ece5da" stroke-width="0.5"/>
+                <line x1="20" y1="68" x2="275" y2="68" stroke="#ece5da" stroke-width="0.5"/>
+                <line x1="20" y1="88" x2="275" y2="88" stroke="#ece5da" stroke-width="0.5"/>
+                <!-- y labels aligned to gridlines -->
+                <text x="16" y="11" text-anchor="end" font-size="7.5" fill="#a0927f" font-family="Inter,sans-serif">8</text>
+                <text x="16" y="31" text-anchor="end" font-size="7.5" fill="#a0927f" font-family="Inter,sans-serif">6</text>
+                <text x="16" y="51" text-anchor="end" font-size="7.5" fill="#a0927f" font-family="Inter,sans-serif">4</text>
+                <text x="16" y="71" text-anchor="end" font-size="7.5" fill="#a0927f" font-family="Inter,sans-serif">2</text>
+                <text x="16" y="91" text-anchor="end" font-size="7.5" fill="#a0927f" font-family="Inter,sans-serif">0</text>
+                <!-- axes -->
+                <line x1="20" y1="8" x2="20" y2="88" stroke="#d4cabb" stroke-width="0.5"/>
+                <line x1="20" y1="88" x2="275" y2="88" stroke="#d4cabb" stroke-width="0.5"/>
+                <!-- bars: 1 unit=10px, baseline=88. 6→60px, 3→30px, 2→20px, 1→10px -->
+                <rect x="29"  y="28" width="34" height="60" rx="2" fill="#c05746"/>
+                <rect x="69"  y="58" width="34" height="30" rx="2" fill="#d4956a"/>
+                <rect x="109" y="68" width="34" height="20" rx="2" fill="#e0b87a"/>
+                <rect x="149" y="68" width="34" height="20" rx="2" fill="#6aab9a"/>
+                <rect x="189" y="68" width="34" height="20" rx="2" fill="#6a9ebd"/>
+                <rect x="229" y="78" width="34" height="10" rx="2" fill="#b8a898"/>
+                <!-- x labels -->
+                <text x="46"  y="100" text-anchor="middle" font-size="7.5" fill="#7a6c5b" font-family="Inter,sans-serif">Ops/CoS</text>
+                <text x="86"  y="100" text-anchor="middle" font-size="7.5" fill="#7a6c5b" font-family="Inter,sans-serif">Creative</text>
+                <text x="126" y="100" text-anchor="middle" font-size="7.5" fill="#7a6c5b" font-family="Inter,sans-serif">Eng/AI</text>
+                <text x="166" y="100" text-anchor="middle" font-size="7.5" fill="#7a6c5b" font-family="Inter,sans-serif">Impact</text>
+                <text x="206" y="100" text-anchor="middle" font-size="7.5" fill="#7a6c5b" font-family="Inter,sans-serif">Mktg</text>
+                <text x="246" y="100" text-anchor="middle" font-size="7.5" fill="#7a6c5b" font-family="Inter,sans-serif">Design</text>
+            </svg>
+
+            <div class="sec-label" style="margin-top:20px">Closures by Region</div>
+            <!-- y-axis 0,2,4,6. unit=10px per 1, baseline=68. 8 bars, w=28, gap=4, start at x=24 -->
+            <svg viewBox="0 0 280 85" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;display:block">
+                <line x1="20" y1="8"  x2="278" y2="8"  stroke="#ece5da" stroke-width="0.5"/>
+                <line x1="20" y1="28" x2="278" y2="28" stroke="#ece5da" stroke-width="0.5"/>
+                <line x1="20" y1="48" x2="278" y2="48" stroke="#ece5da" stroke-width="0.5"/>
+                <line x1="20" y1="68" x2="278" y2="68" stroke="#ece5da" stroke-width="0.5"/>
+                <text x="16" y="11" text-anchor="end" font-size="7.5" fill="#a0927f" font-family="Inter,sans-serif">6</text>
+                <text x="16" y="31" text-anchor="end" font-size="7.5" fill="#a0927f" font-family="Inter,sans-serif">4</text>
+                <text x="16" y="51" text-anchor="end" font-size="7.5" fill="#a0927f" font-family="Inter,sans-serif">2</text>
+                <text x="16" y="71" text-anchor="end" font-size="7.5" fill="#a0927f" font-family="Inter,sans-serif">0</text>
+                <line x1="20" y1="8" x2="20" y2="68" stroke="#d4cabb" stroke-width="0.5"/>
+                <line x1="20" y1="68" x2="278" y2="68" stroke="#d4cabb" stroke-width="0.5"/>
+                <!-- 8 bars: w=28, spacing=32 (28+4gap), start x=24. centers at x+14 -->
+                <rect x="24"  y="18" width="28" height="50" rx="2" fill="#c05746"/>
+                <rect x="56"  y="48" width="28" height="20" rx="2" fill="#d4956a"/>
+                <rect x="88"  y="48" width="28" height="20" rx="2" fill="#e0b87a"/>
+                <rect x="120" y="48" width="28" height="20" rx="2" fill="#6aab9a"/>
+                <rect x="152" y="48" width="28" height="20" rx="2" fill="#6a9ebd"/>
+                <rect x="184" y="58" width="28" height="10" rx="2" fill="#9a8bb5"/>
+                <rect x="216" y="58" width="28" height="10" rx="2" fill="#8a7b6b"/>
+                <rect x="248" y="58" width="28" height="10" rx="2" fill="#b8a898"/>
+                <!-- x labels: bar x + 14 = center -->
+                <text x="38"  y="80" text-anchor="middle" font-size="7" fill="#7a6c5b" font-family="Inter,sans-serif">UK</text>
+                <text x="70"  y="80" text-anchor="middle" font-size="7" fill="#7a6c5b" font-family="Inter,sans-serif">APAC</text>
+                <text x="102" y="80" text-anchor="middle" font-size="7" fill="#7a6c5b" font-family="Inter,sans-serif">Remote</text>
+                <text x="134" y="80" text-anchor="middle" font-size="7" fill="#7a6c5b" font-family="Inter,sans-serif">Contract</text>
+                <text x="166" y="80" text-anchor="middle" font-size="7" fill="#7a6c5b" font-family="Inter,sans-serif">Impact</text>
+                <text x="198" y="80" text-anchor="middle" font-size="7" fill="#7a6c5b" font-family="Inter,sans-serif">Europe</text>
+                <text x="230" y="80" text-anchor="middle" font-size="7" fill="#7a6c5b" font-family="Inter,sans-serif">US/CA</text>
+                <text x="262" y="80" text-anchor="middle" font-size="7" fill="#7a6c5b" font-family="Inter,sans-serif">Picks</text>
+            </svg>
+        </div>
+
+        <div>
+            <div class="sec-label">Notable Signals</div>
+            <ul class="insights">
+                <li>
+                    <strong>UK ops roles are filling fast</strong>
+                    4 UK-based ops/strategy roles closed: Head of Strategy (DfE), Operations Officer (GoodWork), Head of Creative (Finisterre), Sr Event Ops (Founders Forum).
+                    <br><span class="tag tag-r">UK</span><span class="tag tag-t">Ops</span><span class="tag tag-s">Fast fill</span>
+                </li>
+                <li>
+                    <strong>Impact roles closed quickly</strong>
+                    Fashion For Good (Decarbonisation) and ClimateWorks (Comms) both closed — strong applicant pools at impact orgs.
+                    <br><span class="tag tag-r">Social Impact</span><span class="tag tag-s">High demand</span>
+                </li>
+                <li>
+                    <strong>Contract roles churn fast</strong>
+                    Fractional CoS (Strange Ventures) and Full-Stack Engineer (Senja) both closed. Short-term roles fill faster by nature.
+                    <br><span class="tag tag-t">Contract</span><span class="tag tag-s">Expected</span>
+                </li>
+                <li>
+                    <strong>Chief of Staff is a hot title</strong>
+                    2 CoS roles closed, 3 remain open. Shorter time-to-fill than other generalist positions.
+                    <br><span class="tag tag-t">Chief of Staff</span><span class="tag tag-s">Hot market</span>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <p class="weekly-note"><strong>With weekly tracking,</strong> this becomes a hiring pulse — time-to-fill by role type, hiring velocity by company, geographic demand shifts, and automated newsletter content like "fastest-filling roles this week." All derivable from the diff between scans.</p>
+
+    <details class="closed-details">
+        <summary>View all 16 closed listings</summary>
+        <div class="table-wrap">
+        <table>
+            <thead><tr><th>Role</th><th>Status</th><th>Details</th><th>URL</th></tr></thead>
+            <tbody>
+        <tr class="row-closed"><td class="col-role"><span class="job-title">Head of Strategy and Operations</span><span class="job-company">Department for Education (Policy Lab)</span><span class="job-location">Bristol / London / Manchester</span></td><td class="col-status"><span class="badge" style="background:#dc2626">Closed</span></td><td class="col-reason">HTTP 404 — page not found</td><td class="col-link"><a href="https://www.jobsgopublic.com/job/head-strategy-and-operations-45046" target="_blank" rel="noopener">https://www.jobsgopublic.com/job/head-strategy-and-operations-45046</a></td></tr>
+        <tr class="row-closed"><td class="col-role"><span class="job-title">Human Centred Designer</span><span class="job-company">Citizens Advice</span><span class="job-location">England &amp; Wales</span></td><td class="col-status"><span class="badge" style="background:#dc2626">Closed</span></td><td class="col-reason">Role not found on any page of careers site</td><td class="col-link"><a href="https://www.citizensadvice.org.uk/about-us/job-and-voluntary-opportunities/" target="_blank" rel="noopener">https://www.citizensadvice.org.uk/about-us/job-and-voluntary-opportunities/</a></td></tr>
+        <tr class="row-closed"><td class="col-role"><span class="job-title">Head of Creative</span><span class="job-company">Finisterre</span><span class="job-location">Cornwall, UK</span></td><td class="col-status"><span class="badge" style="background:#dc2626">Closed</span></td><td class="col-reason">Role no longer listed on Workable board</td><td class="col-link"><a href="https://apply.workable.com/finisterre/" target="_blank" rel="noopener">https://apply.workable.com/finisterre/</a></td></tr>
+        <tr class="row-closed"><td class="col-role"><span class="job-title">Operations Officer</span><span class="job-company">GoodWork</span><span class="job-location">UK</span></td><td class="col-status"><span class="badge" style="background:#dc2626">Closed</span></td><td class="col-reason">Application form closed (Typeform no longer accepting)</td><td class="col-link"><a href="https://goodworkuk.notion.site/Operations-Officer-30ad53cd8ea7800ebb2ce36de10d5920" target="_blank" rel="noopener">https://goodworkuk.notion.site/Operations-Officer-30ad53cd8ea7800ebb2ce36de10...</a></td></tr>
+        <tr class="row-closed"><td class="col-role"><span class="job-title">Creative Content Manager</span><span class="job-company">Gut Wealth</span><span class="job-location">Edinburgh</span></td><td class="col-status"><span class="badge" style="background:#dc2626">Closed</span></td><td class="col-reason">No longer accepting applications (LinkedIn)</td><td class="col-link"><a href="https://www.linkedin.com/jobs/view/4386378835/" target="_blank" rel="noopener">https://www.linkedin.com/jobs/view/4386378835/</a></td></tr>
+        <tr class="row-closed"><td class="col-role"><span class="job-title">Senior Event Operations Manager 2026</span><span class="job-company">Founders Forum</span><span class="job-location">London</span></td><td class="col-status"><span class="badge" style="background:#dc2626">Closed</span></td><td class="col-reason">Role not found on Workable board</td><td class="col-link"><a href="https://apply.workable.com/foundersforum/" target="_blank" rel="noopener">https://apply.workable.com/foundersforum/</a></td></tr>
+        <tr class="row-closed"><td class="col-role"><span class="job-title">Associate, Membership &amp; Portfolio Services</span><span class="job-company">Gaingels</span><span class="job-location">Remote (NYC preferred)</span></td><td class="col-status"><span class="badge" style="background:#dc2626">Closed</span></td><td class="col-reason">HTTP 404 — page not found</td><td class="col-link"><a href="https://airtable.com/app5yYmLTYhtWXJ44/shr6nCyBDvW7cpkFF" target="_blank" rel="noopener">https://airtable.com/app5yYmLTYhtWXJ44/shr6nCyBDvW7cpkFF</a></td></tr>
+        <tr class="row-closed"><td class="col-role"><span class="job-title">Operations Lead (Business / People Operations)</span><span class="job-company">7people</span><span class="job-location">Amsterdam (on-site)</span></td><td class="col-status"><span class="badge" style="background:#dc2626">Closed</span></td><td class="col-reason">HTTP 404 — page not found</td><td class="col-link"><a href="https://careers.7people.team/o/operations-lead-business-people-operations" target="_blank" rel="noopener">https://careers.7people.team/o/operations-lead-business-people-operations</a></td></tr>
+        <tr class="row-closed"><td class="col-role"><span class="job-title">AI Engineer</span><span class="job-company">heva</span><span class="job-location">Remote India / LATAM</span></td><td class="col-status"><span class="badge" style="background:#dc2626">Closed</span></td><td class="col-reason">Role not found on company hiring page</td><td class="col-link"><a href="https://heva.co/" target="_blank" rel="noopener">https://heva.co/</a></td></tr>
+        <tr class="row-closed"><td class="col-role"><span class="job-title">Chief of Staff</span><span class="job-company">RISE</span><span class="job-location">Bangkok, Thailand</span></td><td class="col-status"><span class="badge" style="background:#dc2626">Closed</span></td><td class="col-reason">Closed signal: "no longer accepting applications"</td><td class="col-link"><a href="https://www.linkedin.com/jobs/view/4375312536/" target="_blank" rel="noopener">https://www.linkedin.com/jobs/view/4375312536/</a></td></tr>
+        <tr class="row-closed"><td class="col-role"><span class="job-title">Ghostwriter</span><span class="job-company">Media CoLab</span><span class="job-location">Remote (1-5pm GMT overlap)</span></td><td class="col-status"><span class="badge" style="background:#dc2626">Closed</span></td><td class="col-reason">Closed signal: "applications closed"</td><td class="col-link"><a href="https://tally.so/r/WO86gL" target="_blank" rel="noopener">https://tally.so/r/WO86gL</a></td></tr>
+        <tr class="row-closed"><td class="col-role"><span class="job-title">AI Ventures Accelerator Program Lead</span><span class="job-company">Technovation</span><span class="job-location">Remote (Global)</span></td><td class="col-status"><span class="badge" style="background:#dc2626">Closed</span></td><td class="col-reason">Apply form closed (Google Forms)</td><td class="col-link"><a href="https://www.idealist.org/en/nonprofit-job/bf1498c121b64ac9a2ec6c07f7a45f00-ai-ve" target="_blank" rel="noopener">https://www.idealist.org/en/nonprofit-job/bf1498c121b64ac9a2ec6c07f7a45f00-ai...</a></td></tr>
+        <tr class="row-closed"><td class="col-role"><span class="job-title">Fractional Chief of Staff</span><span class="job-company">Strange Ventures</span><span class="job-location">San Francisco</span></td><td class="col-status"><span class="badge" style="background:#dc2626">Closed</span></td><td class="col-reason">Apply form closed (Google Forms)</td><td class="col-link"><a href="https://thereview.strangevc.com/p/were-hiring-fractional-chief-of-staff" target="_blank" rel="noopener">https://thereview.strangevc.com/p/were-hiring-fractional-chief-of-staff</a></td></tr>
+        <tr class="row-closed"><td class="col-role"><span class="job-title">Full-Stack Product Engineer</span><span class="job-company">Senja</span><span class="job-location">Cape Town / Remote</span></td><td class="col-status"><span class="badge" style="background:#dc2626">Closed</span></td><td class="col-reason">Role no longer listed — URL points to different position</td><td class="col-link"><a href="https://jobs.senja.io/" target="_blank" rel="noopener">https://jobs.senja.io/</a></td></tr>
+        <tr class="row-closed"><td class="col-role"><span class="job-title">Innovation Associate — Decarbonisation</span><span class="job-company">Fashion For Good</span><span class="job-location">India &rarr; Amsterdam</span></td><td class="col-status"><span class="badge" style="background:#dc2626">Closed</span></td><td class="col-reason">Closed signal: "applications closed"</td><td class="col-link"><a href="https://fashion-for-good.homerun.co/innovation-associate-decarbonisation" target="_blank" rel="noopener">https://fashion-for-good.homerun.co/innovation-associate-decarbonisation</a></td></tr>
+        <tr class="row-closed"><td class="col-role"><span class="job-title">Communications Manager</span><span class="job-company">ClimateWorks</span><span class="job-location">Australia</span></td><td class="col-status"><span class="badge" style="background:#dc2626">Closed</span></td><td class="col-reason">Redirected to board with not_found=true</td><td class="col-link"><a href="https://apply.workable.com/climateworks-foundation-1/j/AA4CF2DD21" target="_blank" rel="noopener">https://apply.workable.com/climateworks-foundation-1/j/AA4CF2DD21</a></td></tr>
+            </tbody>
+        </table>
+        </div>
+    </details>
+
+    <div class="footer">Automated analysis &middot; Listing status changes between scans &middot; Single scan baseline</div>
+</div>
+</body>
+</html>
